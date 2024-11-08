@@ -3,22 +3,16 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <limits>
-
 #include "../include/simple_command.hpp"
 
-namespace vsomeip_v3 {
-namespace protocol {
+#include <limits>
 
-simple_command::simple_command(id_e _id)
-        : command(_id) {
+namespace vsomeip_v3 { namespace protocol {
 
-}
+simple_command::simple_command(id_e _id) : command(_id) {}
 
-void
-simple_command::serialize(std::vector<byte_t> &_buffer,
-        error_e &_error) const {
-
+void simple_command::serialize(std::vector<byte_t>& _buffer, error_e& _error) const
+{
     // no size check as we know this is small enough
 
     // resize buffer
@@ -31,12 +25,10 @@ simple_command::serialize(std::vector<byte_t> &_buffer,
     command::serialize(_buffer, _error);
 }
 
-void
-simple_command::deserialize(const std::vector<byte_t> &_buffer,
-        error_e &_error) {
-
-    if (_buffer.size() < COMMAND_HEADER_SIZE) {
-
+void simple_command::deserialize(const std::vector<byte_t>& _buffer, error_e& _error)
+{
+    if (_buffer.size() < COMMAND_HEADER_SIZE)
+    {
         _error = error_e::ERROR_NOT_ENOUGH_BYTES;
         return;
     }
@@ -44,5 +36,4 @@ simple_command::deserialize(const std::vector<byte_t> &_buffer,
     command::deserialize(_buffer, _error);
 }
 
-} // namespace protocol
-} // namespace vsomeip
+}} // namespace vsomeip_v3::protocol

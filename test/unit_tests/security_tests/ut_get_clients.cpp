@@ -3,26 +3,27 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <memory>
-#include <gtest/gtest.h>
 #include <common/utility.hpp>
+#include <gtest/gtest.h>
+#include <memory>
 
 namespace {
 std::unordered_set<vsomeip_v3::client_t> clients;
 std::unordered_set<vsomeip_v3::client_t> local_clients;
-vsomeip_v3::client_t client_1 = 10;
-vsomeip_v3::client_t client_2 = 11;
-vsomeip_v3::client_t client_3 = 12;
-vsomeip_v3::uid_t uid = 4003030;
-vsomeip_v3::gid_t gid = 4003032;
-vsomeip_sec_ip_addr_t host_address = 0;
-}
+vsomeip_v3::client_t                     client_1     = 10;
+vsomeip_v3::client_t                     client_2     = 11;
+vsomeip_v3::client_t                     client_3     = 12;
+vsomeip_v3::uid_t                        uid          = 4003030;
+vsomeip_v3::gid_t                        gid          = 4003032;
+vsomeip_sec_ip_addr_t                    host_address = 0;
+} // namespace
 
 TEST(get_clients, test)
 {
     std::unique_ptr<vsomeip_v3::policy_manager_impl> security(new vsomeip_v3::policy_manager_impl);
 
-    vsomeip_sec_client_t its_sec_client_uid_gid = utility::create_uds_client(uid, gid, host_address);
+    vsomeip_sec_client_t its_sec_client_uid_gid =
+        utility::create_uds_client(uid, gid, host_address);
 
     // Local_clients has now one client(10).
     local_clients.insert(client_1);

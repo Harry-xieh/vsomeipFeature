@@ -3,30 +3,22 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <limits>
-
-#include <vsomeip/constants.hpp>
-
 #include "../include/unsubscribe_command.hpp"
 
-namespace vsomeip_v3 {
-namespace protocol {
+#include <limits>
+#include <vsomeip/constants.hpp>
 
-unsubscribe_command::unsubscribe_command()
-    : subscribe_command_base(id_e::UNSUBSCRIBE_ID) {
-}
+namespace vsomeip_v3 { namespace protocol {
 
-void
-unsubscribe_command::serialize(std::vector<byte_t> &_buffer,
-        error_e &_error) const {
+unsubscribe_command::unsubscribe_command() : subscribe_command_base(id_e::UNSUBSCRIBE_ID) {}
 
-    size_t its_size(COMMAND_HEADER_SIZE
-            + sizeof(service_) + sizeof(instance_)
-            + sizeof(eventgroup_) + sizeof(major_)
-            + sizeof(event_) + sizeof(pending_id_));
+void unsubscribe_command::serialize(std::vector<byte_t>& _buffer, error_e& _error) const
+{
+    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service_) + sizeof(instance_) + sizeof(eventgroup_)
+                    + sizeof(major_) + sizeof(event_) + sizeof(pending_id_));
 
-    if (its_size > std::numeric_limits<command_size_t>::max()) {
-
+    if (its_size > std::numeric_limits<command_size_t>::max())
+    {
         _error = error_e::ERROR_MAX_COMMAND_SIZE_EXCEEDED;
         return;
     }
@@ -41,17 +33,13 @@ unsubscribe_command::serialize(std::vector<byte_t> &_buffer,
     subscribe_command_base::serialize(_buffer, _error);
 }
 
-void
-unsubscribe_command::deserialize(const std::vector<byte_t> &_buffer,
-        error_e &_error) {
+void unsubscribe_command::deserialize(const std::vector<byte_t>& _buffer, error_e& _error)
+{
+    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service_) + sizeof(instance_) + sizeof(eventgroup_)
+                    + sizeof(major_) + sizeof(event_) + sizeof(pending_id_));
 
-    size_t its_size(COMMAND_HEADER_SIZE
-            + sizeof(service_) + sizeof(instance_)
-            + sizeof(eventgroup_) + sizeof(major_)
-            + sizeof(event_) + sizeof(pending_id_));
-
-    if (its_size > _buffer.size()) {
-
+    if (its_size > _buffer.size())
+    {
         _error = error_e::ERROR_NOT_ENOUGH_BYTES;
         return;
     }
@@ -60,5 +48,4 @@ unsubscribe_command::deserialize(const std::vector<byte_t> &_buffer,
     subscribe_command_base::deserialize(_buffer, _error);
 }
 
-} // namespace protocol
-} // namespace vsomeip
+}} // namespace vsomeip_v3::protocol

@@ -5,13 +5,8 @@
 
 #include "../include/pong_command.hpp"
 
-namespace vsomeip_v3 {
-namespace protocol {
+namespace vsomeip_v3 { namespace protocol {
 
-pong_command::pong_command()
-    : simple_command(id_e::PONG_ID) {
+pong_command::pong_command() : simple_command(id_e::PONG_ID) {}
 
-}
-
-} // namespace protocol
-} // namespace vsomeip
+}} // namespace vsomeip_v3::protocol

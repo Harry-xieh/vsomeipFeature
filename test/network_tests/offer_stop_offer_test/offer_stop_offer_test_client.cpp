@@ -3,24 +3,23 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <future>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <iomanip>
-
-#include <vsomeip/vsomeip.hpp>
-#include <vsomeip/internal/logger.hpp>
-#include <common/vsomeip_app_utilities.hpp>
-#include <common/test_timer.hpp>
-
-#include <gtest/gtest.h>
-
 #include "applications/client.hpp"
 #include "applications/service_ids.hpp"
 #include "offer_stop_offer_test_helper.hpp"
 
-TEST(test_offer_stop_offer, test_offer_stop_offer_client) {
+#include <common/test_timer.hpp>
+#include <common/vsomeip_app_utilities.hpp>
+#include <future>
+#include <gtest/gtest.h>
+#include <iomanip>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <vsomeip/internal/logger.hpp>
+#include <vsomeip/vsomeip.hpp>
+
+TEST(test_offer_stop_offer, test_offer_stop_offer_client)
+{
     // Precondition 1: Service consumer application initializes correctly
     client_t service_consumer;
 
@@ -43,18 +42,20 @@ TEST(test_offer_stop_offer, test_offer_stop_offer_client) {
     //
     // At the end validate that the service was available, atleast once
     test_timer_t test_timer(CLIENT_UP_TIME);
-    bool service_was_available = false;
-    bool request_was_received = false;
-    while (!test_timer.has_elapsed()) {
-        if (service_consumer.is_available()) {
+    bool         service_was_available = false;
+    bool         request_was_received  = false;
+    while (!test_timer.has_elapsed())
+    {
+        if (service_consumer.is_available())
+        {
             service_was_available = true;
 
             auto request_service1_tcp =
-                    service_consumer.request(true, SERVICE_ID, INSTANCE_ID, METHOD_ID);
+                service_consumer.request(true, SERVICE_ID, INSTANCE_ID, METHOD_ID);
             auto request_service2_tcp =
-                    service_consumer.request(true, OTHER_SERVICE_ID, OTHER_INSTANCE_ID, METHOD_ID);
+                service_consumer.request(true, OTHER_SERVICE_ID, OTHER_INSTANCE_ID, METHOD_ID);
             auto request_service2_udp =
-                    service_consumer.request(false, OTHER_SERVICE_ID, OTHER_INSTANCE_ID, METHOD_ID);
+                service_consumer.request(false, OTHER_SERVICE_ID, OTHER_INSTANCE_ID, METHOD_ID);
 
             // check if futures are valid
             ASSERT_TRUE(request_service1_tcp.valid());
@@ -76,7 +77,8 @@ TEST(test_offer_stop_offer, test_offer_stop_offer_client) {
     EXPECT_TRUE(request_was_received);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

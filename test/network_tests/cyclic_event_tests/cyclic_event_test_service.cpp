@@ -7,7 +7,8 @@
 
 using namespace cyclic_event_test;
 
-TEST(CyclicEventTest, ServiceNotifiesClient) {
+TEST(CyclicEventTest, ServiceNotifiesClient)
+{
     // Initialize the runtime.
     auto runtime = vsomeip::runtime::get();
     ASSERT_TRUE(runtime) << "Should create a vsomeip runtime.";
@@ -19,19 +20,19 @@ TEST(CyclicEventTest, ServiceNotifiesClient) {
 
     // Create a promise to shutdown the service.
     std::promise<bool> shutdown_promise;
-    auto shutdown_future = shutdown_promise.get_future();
+    auto               shutdown_future = shutdown_promise.get_future();
 
     // Handle a shutdown method call.
-    application->register_message_handler(SERVICE_ID, INSTANCE_ID, METHOD_ID,
-                                          [runtime, application, &shutdown_promise](
-                                                  const std::shared_ptr<vsomeip::message> message) {
-                                              VSOMEIP_INFO << "Received shutdown request.";
+    application->register_message_handler(
+        SERVICE_ID, INSTANCE_ID, METHOD_ID,
+        [runtime, application, &shutdown_promise](const std::shared_ptr<vsomeip::message> message) {
+            VSOMEIP_INFO << "Received shutdown request.";
 
-                                              auto response = runtime->create_response(message);
-                                              application->send(response);
+            auto response = runtime->create_response(message);
+            application->send(response);
 
-                                              shutdown_promise.set_value(true);
-                                          });
+            shutdown_promise.set_value(true);
+        });
 
     // Offer the test service.
     application->offer_service(SERVICE_ID, INSTANCE_ID, MAJOR_VERSION, MINOR_VERSION);
@@ -39,7 +40,9 @@ TEST(CyclicEventTest, ServiceNotifiesClient) {
                              vsomeip_v3::event_type_e::ET_FIELD);
 
     // Start the vsomeip application.
-    std::thread worker_thread([application] { application->start(); });
+    std::thread worker_thread([application] {
+        application->start();
+    });
 
     // Set the value of the event field.
     auto payload = runtime->create_payload({0x01});
@@ -53,12 +56,14 @@ TEST(CyclicEventTest, ServiceNotifiesClient) {
     application->stop();
 
     // Clean up worker thread.
-    if (worker_thread.joinable()) {
+    if (worker_thread.joinable())
+    {
         worker_thread.join();
     }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

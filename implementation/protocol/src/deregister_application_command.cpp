@@ -3,17 +3,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <limits>
-
 #include "../include/deregister_application_command.hpp"
 
-namespace vsomeip_v3 {
-namespace protocol {
+#include <limits>
+
+namespace vsomeip_v3 { namespace protocol {
 
 deregister_application_command::deregister_application_command()
-    : simple_command(id_e::DEREGISTER_APPLICATION_ID) {
+    : simple_command(id_e::DEREGISTER_APPLICATION_ID)
+{}
 
-}
-
-} // namespace protocol
-} // namespace vsomeip
+}} // namespace vsomeip_v3::protocol

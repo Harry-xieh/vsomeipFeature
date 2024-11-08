@@ -59,36 +59,36 @@
 
 #endif
 
+#include "../../configuration/include/configuration.hpp"
+#include "../include/logger_impl.hpp"
+
 #include <vsomeip/internal/logger.hpp>
 #include <vsomeip/runtime.hpp>
 
-#include "../include/logger_impl.hpp"
-#include "../../configuration/include/configuration.hpp"
-
-namespace vsomeip_v3 {
-namespace logger {
+namespace vsomeip_v3 { namespace logger {
 
 std::mutex message::mutex__;
 
-message::message(level_e _level)
-    : std::ostream(&buffer_),
-      level_(_level) {
-
+message::message(level_e _level) : std::ostream(&buffer_), level_(_level)
+{
     when_ = std::chrono::system_clock::now();
 }
 
-message::~message() try {
-    std::scoped_lock its_lock {mutex__};
-    auto its_logger = logger_impl::get();
+message::~message()
+try
+{
+    std::scoped_lock its_lock{mutex__};
+    auto             its_logger = logger_impl::get();
 
     if (level_ > its_logger->get_loglevel())
         return;
 
-    if (its_logger->has_console_log() || its_logger->has_file_log()) {
-
+    if (its_logger->has_console_log() || its_logger->has_file_log())
+    {
         // Prepare log level
-        const char *its_level;
-        switch (level_) {
+        const char* its_level;
+        switch (level_)
+        {
         case level_e::LL_FATAL:
             its_level = "fatal";
             break;
@@ -112,7 +112,7 @@ message::~message() try {
         };
 
         // Prepare time stamp
-        auto its_time_t = std::chrono::system_clock::to_time_t(when_);
+        auto      its_time_t = std::chrono::system_clock::to_time_t(when_);
         struct tm its_time;
 #ifdef _WIN32
         localtime_s(&its_time, &its_time_t);
@@ -121,7 +121,8 @@ message::~message() try {
 #endif
         auto its_ms = (when_.time_since_epoch().count() / 100) % 1000000;
 
-        if (its_logger->has_console_log()) {
+        if (its_logger->has_console_log())
+        {
 #ifndef ANDROID
             {
                 std::unique_lock<std::mutex> app_name_lock = its_logger->get_app_name_lock();
@@ -138,7 +139,8 @@ message::~message() try {
 #else
             std::string app = runtime::get_property("LogApplication");
 
-            switch (level_) {
+            switch (level_)
+            {
             case level_e::LL_FATAL:
                 ALOGE(app.c_str(), ("VSIP: " + buffer_.data_.str()).c_str());
                 break;
@@ -163,9 +165,11 @@ message::~message() try {
 #endif // !ANDROID
         }
 
-        if (its_logger->has_file_log()) {
+        if (its_logger->has_file_log())
+        {
             std::ofstream its_logfile(its_logger->get_logfile(), std::ios_base::app);
-            if (its_logfile.is_open()) {
+            if (its_logfile.is_open())
+            {
                 its_logfile << std::dec << std::setw(4) << its_time.tm_year + 1900 << "-"
                             << std::dec << std::setw(2) << std::setfill('0') << its_time.tm_mon + 1
                             << "-" << std::dec << std::setw(2) << std::setfill('0')
@@ -178,32 +182,34 @@ message::~message() try {
             }
         }
     }
-    if (its_logger->has_dlt_log()) {
+    if (its_logger->has_dlt_log())
+    {
 #ifdef USE_DLT
 #ifndef ANDROID
         its_logger->log(level_, buffer_.data_.str().c_str());
 #endif
 #endif // USE_DLT
     }
-} catch (const std::exception& e) {
+} catch (const std::exception& e)
+{
     std::cerr << "\nVSIP: Error destroying message class: " << e.what() << '\n';
     return;
 }
 
-std::streambuf::int_type
-message::buffer::overflow(std::streambuf::int_type c) {
-    if (c != EOF) {
+std::streambuf::int_type message::buffer::overflow(std::streambuf::int_type c)
+{
+    if (c != EOF)
+    {
         data_ << (char)c;
     }
 
     return c;
 }
 
-std::streamsize
-message::buffer::xsputn(const char *s, std::streamsize n) {
+std::streamsize message::buffer::xsputn(const char* s, std::streamsize n)
+{
     data_.write(s, n);
     return n;
 }
 
-} // namespace logger
-} // namespace vsomeip_v3
+}} // namespace vsomeip_v3::logger

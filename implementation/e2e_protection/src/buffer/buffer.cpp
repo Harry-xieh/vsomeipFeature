@@ -4,16 +4,23 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "../../../e2e_protection/include/buffer/buffer.hpp"
+
 #include <iomanip>
 
 namespace vsomeip_v3 {
 
-std::ostream &operator<<(std::ostream &_os, const e2e_buffer &_buffer) {
-    for (auto b : _buffer) {
-        if (isupper(b)) {
+std::ostream& operator<<(std::ostream& _os, const e2e_buffer& _buffer)
+{
+    for (auto b : _buffer)
+    {
+        if (isupper(b))
+        {
             _os << b;
-        } else {
-            _os << "[" << std::setfill('0') << std::setw(2) << std::hex << (uint32_t)b << std::dec << "]";
+        }
+        else
+        {
+            _os << "[" << std::setfill('0') << std::setw(2) << std::hex << (uint32_t)b << std::dec
+                << "]";
         }
     }
     return _os;

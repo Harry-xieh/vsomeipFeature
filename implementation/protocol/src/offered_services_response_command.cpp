@@ -5,13 +5,10 @@
 
 #include "../include/offered_services_response_command.hpp"
 
-namespace vsomeip_v3 {
-namespace protocol {
+namespace vsomeip_v3 { namespace protocol {
 
 offered_services_response_command::offered_services_response_command()
-    : multiple_services_command_base(id_e::OFFERED_SERVICES_RESPONSE_ID) {
+    : multiple_services_command_base(id_e::OFFERED_SERVICES_RESPONSE_ID)
+{}
 
-}
-
-} // namespace protocol
-} // namespace vsomeip
+}} // namespace vsomeip_v3::protocol

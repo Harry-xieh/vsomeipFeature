@@ -2,11 +2,11 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-#include <gtest/gtest.h>
-
 #include "application_test_client_availability.cpp"
-#include "application_test_service.cpp"
 #include "application_test_daemon.cpp"
+#include "application_test_service.cpp"
+
+#include <gtest/gtest.h>
 
 TEST(someip_application_test_availability, register_availability_handlers)
 {
@@ -18,13 +18,14 @@ TEST(someip_application_test_availability, register_availability_handlers)
 
     // start client
     application_test_client_availability its_client(application_test::service);
-    int counter(0);
-    while (!its_client.all_availability_handlers_called() && counter < 500) {
+    int                                  counter(0);
+    while (!its_client.all_availability_handlers_called() && counter < 500)
+    {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         counter++;
     }
 
-    //shutdown
+    // shutdown
     its_receiver.stop();
     its_client.stop();
     its_daemon.stop();

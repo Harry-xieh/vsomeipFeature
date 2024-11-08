@@ -3,87 +3,71 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <limits>
-
 #include "../include/send_command.hpp"
 
-namespace vsomeip_v3 {
-namespace protocol {
+#include <limits>
 
-send_command::send_command(id_e _id)
-    : command(_id) {
-}
+namespace vsomeip_v3 { namespace protocol {
 
-instance_t
-send_command::get_instance() const {
+send_command::send_command(id_e _id) : command(_id) {}
 
+instance_t send_command::get_instance() const
+{
     return instance_;
 }
 
-void
-send_command::set_instance(instance_t _instance) {
-
+void send_command::set_instance(instance_t _instance)
+{
     instance_ = _instance;
 }
 
-bool
-send_command::is_reliable() const {
-
+bool send_command::is_reliable() const
+{
     return is_reliable_;
 }
 
-void
-send_command::set_reliable(bool _is_reliable) {
-
+void send_command::set_reliable(bool _is_reliable)
+{
     is_reliable_ = _is_reliable;
 }
 
-uint8_t
-send_command::get_status() const {
-
+uint8_t send_command::get_status() const
+{
     return status_;
 }
 
-void
-send_command::set_status(uint8_t _status) {
-
+void send_command::set_status(uint8_t _status)
+{
     status_ = _status;
 }
 
-client_t
-send_command::get_target() const {
-
+client_t send_command::get_target() const
+{
     return target_;
 }
 
-void
-send_command::set_target(client_t _target) {
-
+void send_command::set_target(client_t _target)
+{
     target_ = _target;
 }
 
-std::vector<byte_t>
-send_command::get_message() const {
-
+std::vector<byte_t> send_command::get_message() const
+{
     return message_;
 }
 
-void
-send_command::set_message(const std::vector<byte_t> &_message) {
-
+void send_command::set_message(const std::vector<byte_t>& _message)
+{
     message_ = std::move(_message);
 }
 
-void
-send_command::serialize(std::vector<byte_t> &_buffer,
-        error_e &_error) const {
+void send_command::serialize(std::vector<byte_t>& _buffer, error_e& _error) const
+{
+    size_t its_size(COMMAND_HEADER_SIZE + sizeof(instance_) + sizeof(is_reliable_) + sizeof(status_)
+                    + sizeof(target_) + message_.size());
 
-    size_t its_size(COMMAND_HEADER_SIZE + sizeof(instance_)
-            + sizeof(is_reliable_) + sizeof(status_)
-            + sizeof(target_) + message_.size());
-
-    if (its_size > std::numeric_limits<command_size_t>::max()) {
-
+    if (its_size > std::numeric_limits<command_size_t>::max())
+    {
         _error = error_e::ERROR_MAX_COMMAND_SIZE_EXCEEDED;
         return;
     }
@@ -112,16 +96,13 @@ send_command::serialize(std::vector<byte_t> &_buffer,
     std::memcpy(&_buffer[its_offset], &message_[0], message_.size());
 }
 
-void
-send_command::deserialize(const std::vector<byte_t> &_buffer,
-        error_e &_error) {
+void send_command::deserialize(const std::vector<byte_t>& _buffer, error_e& _error)
+{
+    size_t its_size(COMMAND_HEADER_SIZE + sizeof(instance_) + sizeof(is_reliable_) + sizeof(status_)
+                    + sizeof(target_));
 
-    size_t its_size(COMMAND_HEADER_SIZE + sizeof(instance_)
-                + sizeof(is_reliable_) + sizeof(status_)
-                + sizeof(target_));
-
-    if (its_size > _buffer.size()) {
-
+    if (its_size > _buffer.size())
+    {
         _error = error_e::ERROR_NOT_ENOUGH_BYTES;
         return;
     }
@@ -145,5 +126,4 @@ send_command::deserialize(const std::vector<byte_t> &_buffer,
     std::memcpy(&message_[0], &_buffer[its_offset], message_.size());
 }
 
-} // namespace protocol
-} // namespace vsomeip
+}} // namespace vsomeip_v3::protocol
