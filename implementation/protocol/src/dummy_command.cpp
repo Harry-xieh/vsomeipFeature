@@ -3,24 +3,32 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "../include/dummy_command.hpp"
-
 #include <limits>
 
-namespace vsomeip_v3 { namespace protocol {
+#include "../include/dummy_command.hpp"
 
-dummy_command::dummy_command() : command(id_e::UNKNOWN_ID) {}
+namespace vsomeip_v3 {
+namespace protocol {
 
-void dummy_command::serialize(std::vector<byte_t>& _buffer, error_e& _error) const
-{
+dummy_command::dummy_command()
+        : command(id_e::UNKNOWN_ID) {
+
+}
+
+void
+dummy_command::serialize(std::vector<byte_t> &_buffer,
+        error_e &_error) const {
+
     (void)_buffer;
     _error = error_e::ERROR_NOT_ALLOWED;
 }
 
-void dummy_command::deserialize(const std::vector<byte_t>& _buffer, error_e& _error)
-{
-    if (_buffer.size() < COMMAND_HEADER_SIZE)
-    {
+void
+dummy_command::deserialize(const std::vector<byte_t> &_buffer,
+        error_e &_error) {
+
+    if (_buffer.size() < COMMAND_HEADER_SIZE) {
+
         _error = error_e::ERROR_NOT_ENOUGH_BYTES;
         return;
     }
@@ -28,4 +36,5 @@ void dummy_command::deserialize(const std::vector<byte_t>& _buffer, error_e& _er
     command::deserialize(_buffer, _error);
 }
 
-}} // namespace vsomeip_v3::protocol
+} // namespace protocol
+} // namespace vsomeip

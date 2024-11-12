@@ -12,40 +12,41 @@
 /*
  * These definitions MUST remain in the global namespace.
  */
-extern "C" {
-/*
- * The real socket(2), renamed by GCC.
- */
-int __real_socket(int domain, int type, int protocol) noexcept;
-
-/*
- * Overrides socket(2) to set SOCK_CLOEXEC by default.
- */
-int __wrap_socket(int domain, int type, int protocol) noexcept
+extern "C"
 {
-    return __real_socket(domain, type | SOCK_CLOEXEC, protocol);
-}
+    /*
+     * The real socket(2), renamed by GCC.
+     */
+    int __real_socket(int domain, int type, int protocol) noexcept;
 
-/*
- * Overrides accept(2) to set SOCK_CLOEXEC by default.
- */
-int __wrap_accept(int sockfd, struct sockaddr* addr, socklen_t* addrlen)
-{
-    return accept4(sockfd, addr, addrlen, SOCK_CLOEXEC);
-}
+    /*
+     * Overrides socket(2) to set SOCK_CLOEXEC by default.
+     */
+    int __wrap_socket(int domain, int type, int protocol) noexcept
+    {
+        return __real_socket(domain, type | SOCK_CLOEXEC, protocol);
+    }
 
-/*
- * The real open(2), renamed by GCC.
- */
-int __real_open(const char* pathname, int flags, mode_t mode);
+    /*
+     * Overrides accept(2) to set SOCK_CLOEXEC by default.
+     */
+    int __wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+    {
+        return accept4(sockfd, addr, addrlen, SOCK_CLOEXEC);
+    }
 
-/*
- * Overrides open(2) to set O_CLOEXEC by default.
- */
-int __wrap_open(const char* pathname, int flags, mode_t mode)
-{
-    return __real_open(pathname, flags | O_CLOEXEC, mode);
-}
+    /*
+     * The real open(2), renamed by GCC.
+     */
+    int __real_open(const char *pathname, int flags, mode_t mode);
+
+    /*
+     * Overrides open(2) to set O_CLOEXEC by default.
+     */
+    int __wrap_open(const char *pathname, int flags, mode_t mode)
+    {
+        return __real_open(pathname, flags | O_CLOEXEC, mode);
+    }
 }
 
 #endif

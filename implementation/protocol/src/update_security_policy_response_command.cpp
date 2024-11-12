@@ -5,10 +5,14 @@
 
 #include "../include/update_security_policy_response_command.hpp"
 
-namespace vsomeip_v3 { namespace protocol {
+namespace vsomeip_v3 {
+namespace protocol {
 
 update_security_policy_response_command::update_security_policy_response_command()
-    : security_policy_response_command_base(id_e::UPDATE_SECURITY_POLICY_RESPONSE_ID)
-{}
+    : security_policy_response_command_base(
+            id_e::UPDATE_SECURITY_POLICY_RESPONSE_ID) {
 
-}} // namespace vsomeip_v3::protocol
+}
+
+} // namespace protocol
+} // namespace vsomeip

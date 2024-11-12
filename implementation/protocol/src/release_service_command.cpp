@@ -3,20 +3,27 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "../include/release_service_command.hpp"
-
 #include <limits>
 
-namespace vsomeip_v3 { namespace protocol {
+#include "../include/release_service_command.hpp"
 
-release_service_command::release_service_command() : command(id_e::RELEASE_SERVICE_ID) {}
+namespace vsomeip_v3 {
+namespace protocol {
 
-void release_service_command::serialize(std::vector<byte_t>& _buffer, error_e& _error) const
-{
-    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service::service_) + sizeof(service::instance_));
+release_service_command::release_service_command()
+    : command(id_e::RELEASE_SERVICE_ID) {
 
-    if (its_size > std::numeric_limits<command_size_t>::max())
-    {
+}
+
+void
+release_service_command::serialize(std::vector<byte_t> &_buffer,
+        error_e &_error) const {
+
+    size_t its_size(COMMAND_HEADER_SIZE
+                + sizeof(service::service_) + sizeof(service::instance_));
+
+    if (its_size > std::numeric_limits<command_size_t>::max()) {
+
         _error = error_e::ERROR_MAX_COMMAND_SIZE_EXCEEDED;
         return;
     }
@@ -39,12 +46,15 @@ void release_service_command::serialize(std::vector<byte_t>& _buffer, error_e& _
     std::memcpy(&_buffer[its_offset], &service_.instance_, sizeof(service_.instance_));
 }
 
-void release_service_command::deserialize(const std::vector<byte_t>& _buffer, error_e& _error)
-{
-    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service::service_) + sizeof(service::instance_));
+void
+release_service_command::deserialize(const std::vector<byte_t> &_buffer,
+        error_e &_error) {
 
-    if (its_size > _buffer.size())
-    {
+    size_t its_size(COMMAND_HEADER_SIZE
+            + sizeof(service::service_) + sizeof(service::instance_));
+
+    if (its_size > _buffer.size()) {
+
         _error = error_e::ERROR_NOT_ENOUGH_BYTES;
         return;
     }
@@ -56,29 +66,36 @@ void release_service_command::deserialize(const std::vector<byte_t>& _buffer, er
 
     // deserialize payload
     size_t its_offset(COMMAND_POSITION_PAYLOAD);
-    std::memcpy(&service_.service_, &_buffer[its_offset], sizeof(service_.service_));
+    std::memcpy(&service_.service_, &_buffer[its_offset],
+            sizeof(service_.service_));
     its_offset += sizeof(service_.service_);
-    std::memcpy(&service_.instance_, &_buffer[its_offset], sizeof(service_.instance_));
+    std::memcpy(&service_.instance_, &_buffer[its_offset],
+            sizeof(service_.instance_));
 }
 
-service_t release_service_command::get_service() const
-{
+service_t
+release_service_command::get_service() const {
+
     return service_.service_;
 }
 
-void release_service_command::set_service(service_t _service)
-{
+void
+release_service_command::set_service(service_t _service) {
+
     service_.service_ = _service;
 }
 
-instance_t release_service_command::get_instance() const
-{
+instance_t
+release_service_command::get_instance() const {
+
     return service_.instance_;
 }
 
-void release_service_command::set_instance(instance_t _instance)
-{
+void
+release_service_command::set_instance(instance_t _instance) {
+
     service_.instance_ = _instance;
 }
 
-}} // namespace vsomeip_v3::protocol
+} // namespace protocol
+} // namespace vsomeip

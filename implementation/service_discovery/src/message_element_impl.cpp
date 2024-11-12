@@ -5,21 +5,20 @@
 
 #include "../include/message_element_impl.hpp"
 
-namespace vsomeip_v3 { namespace sd {
+namespace vsomeip_v3 {
+namespace sd {
 
-message_element_impl::message_element_impl()
-{
+message_element_impl::message_element_impl() {
     owner_ = 0;
 }
 
-message_impl* message_element_impl::get_owning_message() const
-{
+message_impl * message_element_impl::get_owning_message() const {
     return owner_;
 }
 
-void message_element_impl::set_owning_message(message_impl* _owner)
-{
+void message_element_impl::set_owning_message(message_impl *_owner) {
     owner_ = _owner;
 }
 
-}} // namespace vsomeip_v3::sd
+} // namespace sd
+} // namespace vsomeip_v3

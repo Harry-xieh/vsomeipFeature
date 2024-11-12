@@ -5,9 +5,13 @@
 
 #include "../include/subscribe_ack_command.hpp"
 
-namespace vsomeip_v3 { namespace protocol {
+namespace vsomeip_v3 {
+namespace protocol {
 
-subscribe_ack_command::subscribe_ack_command() : subscribe_ack_command_base(id_e::SUBSCRIBE_ACK_ID)
-{}
+subscribe_ack_command::subscribe_ack_command()
+    : subscribe_ack_command_base(id_e::SUBSCRIBE_ACK_ID) {
 
-}} // namespace vsomeip_v3::protocol
+}
+
+} // namespace protocol
+} // namespace vsomeip

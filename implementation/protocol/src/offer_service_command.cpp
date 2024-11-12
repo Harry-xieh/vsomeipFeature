@@ -5,8 +5,13 @@
 
 #include "../include/offer_service_command.hpp"
 
-namespace vsomeip_v3 { namespace protocol {
+namespace vsomeip_v3 {
+namespace protocol {
 
-offer_service_command::offer_service_command() : service_command_base(id_e::OFFER_SERVICE_ID) {}
+offer_service_command::offer_service_command()
+    : service_command_base(id_e::OFFER_SERVICE_ID) {
 
-}} // namespace vsomeip_v3::protocol
+}
+
+} // namespace protocol
+} // namespace vsomeip

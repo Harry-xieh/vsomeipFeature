@@ -5,8 +5,13 @@
 
 #include "../include/ping_command.hpp"
 
-namespace vsomeip_v3 { namespace protocol {
+namespace vsomeip_v3 {
+namespace protocol {
 
-ping_command::ping_command() : simple_command(id_e::PING_ID) {}
+ping_command::ping_command()
+    : simple_command(id_e::PING_ID) {
 
-}} // namespace vsomeip_v3::protocol
+}
+
+} // namespace protocol
+} // namespace vsomeip

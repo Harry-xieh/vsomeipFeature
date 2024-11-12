@@ -5,8 +5,13 @@
 
 #include "../include/registered_ack_command.hpp"
 
-namespace vsomeip_v3 { namespace protocol {
+namespace vsomeip_v3 {
+namespace protocol {
 
-registered_ack_command::registered_ack_command() : simple_command(id_e::REGISTERED_ACK_ID) {}
+registered_ack_command::registered_ack_command()
+    : simple_command(id_e::REGISTERED_ACK_ID) {
 
-}} // namespace vsomeip_v3::protocol
+}
+
+} // namespace protocol
+} // namespace vsomeip

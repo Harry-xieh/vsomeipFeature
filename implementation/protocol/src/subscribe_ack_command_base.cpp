@@ -3,12 +3,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "../include/subscribe_ack_command_base.hpp"
-
 #include <limits>
+
 #include <vsomeip/constants.hpp>
 
-namespace vsomeip_v3 { namespace protocol {
+#include "../include/subscribe_ack_command_base.hpp"
+
+namespace vsomeip_v3 {
+namespace protocol {
 
 subscribe_ack_command_base::subscribe_ack_command_base(id_e _id)
     : command(_id),
@@ -17,76 +19,92 @@ subscribe_ack_command_base::subscribe_ack_command_base(id_e _id)
       eventgroup_(0),
       subscriber_(0),
       event_(ANY_EVENT),
-      pending_id_(0)
-{}
+      pending_id_(0) {
+}
 
-service_t subscribe_ack_command_base::get_service() const
-{
+service_t
+subscribe_ack_command_base::get_service() const {
+
     return service_;
 }
 
-void subscribe_ack_command_base::set_service(service_t _service)
-{
+void
+subscribe_ack_command_base::set_service(service_t _service) {
+
     service_ = _service;
 }
 
-instance_t subscribe_ack_command_base::get_instance() const
-{
+instance_t
+subscribe_ack_command_base::get_instance() const {
+
     return instance_;
 }
 
-void subscribe_ack_command_base::set_instance(instance_t _instance)
-{
+void
+subscribe_ack_command_base::set_instance(instance_t _instance) {
+
     instance_ = _instance;
 }
 
-eventgroup_t subscribe_ack_command_base::get_eventgroup() const
-{
+eventgroup_t
+subscribe_ack_command_base::get_eventgroup() const {
+
     return eventgroup_;
 }
 
-void subscribe_ack_command_base::set_eventgroup(eventgroup_t _eventgroup)
-{
+void
+subscribe_ack_command_base::set_eventgroup(eventgroup_t _eventgroup) {
+
     eventgroup_ = _eventgroup;
 }
 
-client_t subscribe_ack_command_base::get_subscriber() const
-{
+client_t
+subscribe_ack_command_base::get_subscriber() const {
+
     return subscriber_;
 }
 
-void subscribe_ack_command_base::set_subscriber(client_t _subscriber)
-{
+void
+subscribe_ack_command_base::set_subscriber(client_t _subscriber) {
+
     subscriber_ = _subscriber;
 }
 
-event_t subscribe_ack_command_base::get_event() const
-{
+event_t
+subscribe_ack_command_base::get_event() const {
+
     return event_;
 }
 
-void subscribe_ack_command_base::set_event(event_t _event)
-{
+void
+subscribe_ack_command_base::set_event(event_t _event) {
+
     event_ = _event;
 }
 
-pending_id_t subscribe_ack_command_base::get_pending_id() const
-{
+pending_id_t
+subscribe_ack_command_base::get_pending_id() const {
+
     return pending_id_;
 }
 
-void subscribe_ack_command_base::set_pending_id(pending_id_t _pending_id)
-{
+void
+subscribe_ack_command_base::set_pending_id(pending_id_t _pending_id) {
+
     pending_id_ = _pending_id;
 }
 
-void subscribe_ack_command_base::serialize(std::vector<byte_t>& _buffer, error_e& _error) const
-{
-    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service_) + sizeof(instance_) + sizeof(eventgroup_)
-                    + sizeof(subscriber_) + sizeof(event_) + sizeof(pending_id_));
+void
+subscribe_ack_command_base::serialize(std::vector<byte_t> &_buffer,
+        error_e &_error) const {
 
-    if (its_size > std::numeric_limits<command_size_t>::max())
-    {
+    size_t its_size(COMMAND_HEADER_SIZE
+            + sizeof(service_) + sizeof(instance_)
+            + sizeof(eventgroup_) + sizeof(subscriber_)
+            + sizeof(event_) + sizeof(pending_id_));
+
+    if (its_size > std::numeric_limits<command_size_t>::max()) {
+
         _error = error_e::ERROR_MAX_COMMAND_SIZE_EXCEEDED;
         return;
     }
@@ -117,13 +135,17 @@ void subscribe_ack_command_base::serialize(std::vector<byte_t>& _buffer, error_e
     std::memcpy(&_buffer[its_offset], &pending_id_, sizeof(pending_id_));
 }
 
-void subscribe_ack_command_base::deserialize(const std::vector<byte_t>& _buffer, error_e& _error)
-{
-    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service_) + sizeof(instance_) + sizeof(eventgroup_)
-                    + sizeof(subscriber_) + sizeof(event_) + sizeof(pending_id_));
+void
+subscribe_ack_command_base::deserialize(const std::vector<byte_t> &_buffer,
+        error_e &_error) {
 
-    if (its_size > _buffer.size())
-    {
+    size_t its_size(COMMAND_HEADER_SIZE
+            + sizeof(service_) + sizeof(instance_)
+            + sizeof(eventgroup_) + sizeof(subscriber_)
+            + sizeof(event_) + sizeof(pending_id_));
+
+    if (its_size > _buffer.size()) {
+
         _error = error_e::ERROR_NOT_ENOUGH_BYTES;
         return;
     }
@@ -148,4 +170,5 @@ void subscribe_ack_command_base::deserialize(const std::vector<byte_t>& _buffer,
     std::memcpy(&pending_id_, &_buffer[its_offset], sizeof(pending_id_));
 }
 
-}} // namespace vsomeip_v3::protocol
+} // namespace protocol
+} // namespace vsomeip

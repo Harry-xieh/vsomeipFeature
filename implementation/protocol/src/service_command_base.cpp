@@ -3,61 +3,75 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "../include/service_command_base.hpp"
-
 #include <limits>
 
-namespace vsomeip_v3 { namespace protocol {
+#include "../include/service_command_base.hpp"
 
-service_command_base::service_command_base(id_e _id) : command(_id) {}
+namespace vsomeip_v3 {
+namespace protocol {
 
-service_t service_command_base::get_service() const
-{
+service_command_base::service_command_base(id_e _id)
+    : command(_id) {
+}
+
+service_t
+service_command_base::get_service() const {
+
     return service_.service_;
 }
 
-void service_command_base::set_service(service_t _service)
-{
+void
+service_command_base::set_service(service_t _service) {
+
     service_.service_ = _service;
 }
 
-instance_t service_command_base::get_instance() const
-{
+instance_t
+service_command_base::get_instance() const {
+
     return service_.instance_;
 }
 
-void service_command_base::set_instance(instance_t _instance)
-{
+void
+service_command_base::set_instance(instance_t _instance) {
+
     service_.instance_ = _instance;
 }
 
-major_version_t service_command_base::get_major() const
-{
+major_version_t
+service_command_base::get_major() const {
+
     return service_.major_;
 }
 
-void service_command_base::set_major(major_version_t _major)
-{
+void
+service_command_base::set_major(major_version_t _major) {
+
     service_.major_ = _major;
 }
 
-minor_version_t service_command_base::get_minor() const
-{
+minor_version_t
+service_command_base::get_minor() const {
+
     return service_.minor_;
 }
 
-void service_command_base::set_minor(minor_version_t _minor)
-{
+void
+service_command_base::set_minor(minor_version_t _minor) {
+
     service_.minor_ = _minor;
 }
 
-void service_command_base::serialize(std::vector<byte_t>& _buffer, error_e& _error) const
-{
-    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service_.service_) + sizeof(service_.instance_)
-                    + sizeof(service_.major_) + sizeof(service_.minor_));
+void
+service_command_base::serialize(std::vector<byte_t> &_buffer,
+        error_e &_error) const {
 
-    if (its_size > std::numeric_limits<command_size_t>::max())
-    {
+    size_t its_size(COMMAND_HEADER_SIZE
+            + sizeof(service_.service_) + sizeof(service_.instance_)
+            + sizeof(service_.major_) + sizeof(service_.minor_));
+
+    if (its_size > std::numeric_limits<command_size_t>::max()) {
+
         _error = error_e::ERROR_MAX_COMMAND_SIZE_EXCEEDED;
         return;
     }
@@ -84,13 +98,16 @@ void service_command_base::serialize(std::vector<byte_t>& _buffer, error_e& _err
     std::memcpy(&_buffer[its_offset], &service_.minor_, sizeof(service_.minor_));
 }
 
-void service_command_base::deserialize(const std::vector<byte_t>& _buffer, error_e& _error)
-{
-    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service_.service_) + sizeof(service_.instance_)
-                    + sizeof(service_.major_) + sizeof(service_.minor_));
+void
+service_command_base::deserialize(const std::vector<byte_t> &_buffer,
+        error_e &_error) {
 
-    if (its_size > _buffer.size())
-    {
+    size_t its_size(COMMAND_HEADER_SIZE
+            + sizeof(service_.service_) + sizeof(service_.instance_)
+            + sizeof(service_.major_) + sizeof(service_.minor_));
+
+    if (its_size > _buffer.size()) {
+
         _error = error_e::ERROR_NOT_ENOUGH_BYTES;
         return;
     }
@@ -109,4 +126,5 @@ void service_command_base::deserialize(const std::vector<byte_t>& _buffer, error
     std::memcpy(&service_.minor_, &_buffer[its_offset], sizeof(service_.minor_));
 }
 
-}} // namespace vsomeip_v3::protocol
+} // namespace protocol
+} // namespace vsomeip

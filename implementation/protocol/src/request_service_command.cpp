@@ -5,10 +5,13 @@
 
 #include "../include/request_service_command.hpp"
 
-namespace vsomeip_v3 { namespace protocol {
+namespace vsomeip_v3 {
+namespace protocol {
 
 request_service_command::request_service_command()
-    : multiple_services_command_base(id_e::REQUEST_SERVICE_ID)
-{}
+    : multiple_services_command_base(id_e::REQUEST_SERVICE_ID) {
 
-}} // namespace vsomeip_v3::protocol
+}
+
+} // namespace protocol
+} // namespace vsomeip

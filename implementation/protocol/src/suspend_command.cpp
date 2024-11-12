@@ -5,8 +5,13 @@
 
 #include "../include/suspend_command.hpp"
 
-namespace vsomeip_v3 { namespace protocol {
+namespace vsomeip_v3 {
+namespace protocol {
 
-suspend_command::suspend_command() : simple_command(id_e::SUSPEND_ID) {}
+suspend_command::suspend_command()
+    : simple_command(id_e::SUSPEND_ID) {
 
-}} // namespace vsomeip_v3::protocol
+}
+
+} // namespace protocol
+} // namespace vsomeip

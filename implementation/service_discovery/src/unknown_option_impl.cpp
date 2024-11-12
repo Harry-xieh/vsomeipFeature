@@ -7,13 +7,13 @@
 
 #include "../../message/include/deserializer.hpp"
 
-namespace vsomeip_v3 { namespace sd {
+namespace vsomeip_v3 {
+namespace sd {
 
-bool sd::unknown_option_impl::deserialize(deserializer* _from)
+bool sd::unknown_option_impl::deserialize(deserializer * _from)
 {
     // Deserialize the header.
-    if (!option_impl::deserialize(_from))
-    {
+    if (!option_impl::deserialize(_from)) {
         return false;
     }
     payload_ = std::vector<uint8_t>(length_ - 1);
@@ -27,4 +27,5 @@ const std::vector<uint8_t>& unknown_option_impl::get_payload() const
     return payload_;
 }
 
-}} // namespace vsomeip_v3::sd
+} // namespace sd
+} // namespace vsomeip_v3

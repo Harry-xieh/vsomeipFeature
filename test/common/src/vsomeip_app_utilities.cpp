@@ -24,12 +24,13 @@ std::shared_ptr<vsomeip_v3::message> create_standard_vsip_request(
     return its_message;
 }
 
-base_logger::base_logger(const char* dlt_application_id, const char* dlt_application_name)
-    : _dlt_application_id(dlt_application_id), _dlt_application_name(dlt_application_name)
+base_logger::base_logger(const char *dlt_application_id, const char *dlt_application_name)
+        : _dlt_application_id(dlt_application_id),
+          _dlt_application_name(dlt_application_name)
 {
 #ifdef USE_DLT
 #ifndef ANDROID
-    DLT_REGISTER_APP(_dlt_application_id, _dlt_application_name);
+        DLT_REGISTER_APP(_dlt_application_id, _dlt_application_name);
 #endif
 #endif
 }
@@ -43,8 +44,7 @@ base_logger::~base_logger()
 #endif
 }
 
-base_vsip_app::base_vsip_app(const char* app_name_, const char* app_id_)
-    : base_logger(app_name_, app_id_)
+base_vsip_app::base_vsip_app(const char *app_name_, const char *app_id_) : base_logger( app_name_, app_id_)
 {
     _app = vsomeip::runtime::get()->create_application(app_name_);
     _app->init();
@@ -61,4 +61,4 @@ base_vsip_app::~base_vsip_app()
     _app->stop();
     _run_thread.join();
 }
-} // namespace vsomeip_utilities
+}

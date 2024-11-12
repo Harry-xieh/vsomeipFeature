@@ -3,22 +3,30 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "../include/expire_command.hpp"
-
 #include <limits>
+
 #include <vsomeip/constants.hpp>
 
-namespace vsomeip_v3 { namespace protocol {
+#include "../include/expire_command.hpp"
 
-expire_command::expire_command() : subscribe_command_base(id_e::EXPIRE_ID) {}
+namespace vsomeip_v3 {
+namespace protocol {
 
-void expire_command::serialize(std::vector<byte_t>& _buffer, error_e& _error) const
-{
-    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service_) + sizeof(instance_) + sizeof(eventgroup_)
-                    + sizeof(major_) + sizeof(event_) + sizeof(pending_id_));
+expire_command::expire_command()
+    : subscribe_command_base(id_e::EXPIRE_ID) {
+}
 
-    if (its_size > std::numeric_limits<command_size_t>::max())
-    {
+void
+expire_command::serialize(std::vector<byte_t> &_buffer,
+        error_e &_error) const {
+
+    size_t its_size(COMMAND_HEADER_SIZE
+            + sizeof(service_) + sizeof(instance_)
+            + sizeof(eventgroup_) + sizeof(major_)
+            + sizeof(event_) + sizeof(pending_id_));
+
+    if (its_size > std::numeric_limits<command_size_t>::max()) {
+
         _error = error_e::ERROR_MAX_COMMAND_SIZE_EXCEEDED;
         return;
     }
@@ -33,13 +41,17 @@ void expire_command::serialize(std::vector<byte_t>& _buffer, error_e& _error) co
     subscribe_command_base::serialize(_buffer, _error);
 }
 
-void expire_command::deserialize(const std::vector<byte_t>& _buffer, error_e& _error)
-{
-    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service_) + sizeof(instance_) + sizeof(eventgroup_)
-                    + sizeof(major_) + sizeof(event_) + sizeof(pending_id_));
+void
+expire_command::deserialize(const std::vector<byte_t> &_buffer,
+        error_e &_error) {
 
-    if (its_size > _buffer.size())
-    {
+    size_t its_size(COMMAND_HEADER_SIZE
+            + sizeof(service_) + sizeof(instance_)
+            + sizeof(eventgroup_) + sizeof(major_)
+            + sizeof(event_) + sizeof(pending_id_));
+
+    if (its_size > _buffer.size()) {
+
         _error = error_e::ERROR_NOT_ENOUGH_BYTES;
         return;
     }
@@ -48,4 +60,5 @@ void expire_command::deserialize(const std::vector<byte_t>& _buffer, error_e& _e
     subscribe_command_base::deserialize(_buffer, _error);
 }
 
-}} // namespace vsomeip_v3::protocol
+} // namespace protocol
+} // namespace vsomeip

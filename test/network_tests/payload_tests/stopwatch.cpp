@@ -8,11 +8,12 @@
 #include <cassert>
 #include <ctime>
 
-#define USEC_PER_SEC 1000000ULL
+
+#define USEC_PER_SEC  1000000ULL
 #define NSEC_PER_USEC 1000ULL
 
-stop_watch::usec_t stop_watch::get_total_elapsed_microseconds() const
-{
+
+stop_watch::usec_t stop_watch::get_total_elapsed_microseconds() const {
     usec_t elapsed = total_elapsed_;
 
     if (started_)
@@ -21,13 +22,11 @@ stop_watch::usec_t stop_watch::get_total_elapsed_microseconds() const
     return elapsed;
 }
 
-stop_watch::usec_t stop_watch::get_total_elapsed_seconds() const
-{
+stop_watch::usec_t stop_watch::get_total_elapsed_seconds() const {
     return get_total_elapsed_microseconds() / USEC_PER_SEC;
 }
 
-stop_watch::usec_t stop_watch::now()
-{
+stop_watch::usec_t stop_watch::now() {
     struct timespec ts;
 
 #ifdef __QNX__
@@ -38,5 +37,5 @@ stop_watch::usec_t stop_watch::now()
     assert(!ret);
     static_cast<void>(ret); // prevent warning in release build
 
-    return (usec_t)ts.tv_sec * USEC_PER_SEC + (usec_t)ts.tv_nsec / NSEC_PER_USEC;
+    return (usec_t) ts.tv_sec * USEC_PER_SEC + (usec_t) ts.tv_nsec / NSEC_PER_USEC;
 }

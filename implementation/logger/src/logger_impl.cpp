@@ -3,30 +3,31 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "../include/logger_impl.hpp"
-
-#include "../../configuration/include/configuration.hpp"
-
 #include <iostream>
+
 #include <vsomeip/runtime.hpp>
 
-namespace vsomeip_v3 { namespace logger {
+#include "../include/logger_impl.hpp"
+#include "../../configuration/include/configuration.hpp"
 
-std::mutex  logger_impl::mutex__;
+namespace vsomeip_v3 {
+namespace logger {
+
+std::mutex logger_impl::mutex__;
 std::string logger_impl::app_name__;
 
-void logger_impl::init(const std::shared_ptr<configuration>& _configuration)
-{
-    std::scoped_lock its_lock{mutex__};
-    auto             its_logger = logger_impl::get();
+void
+logger_impl::init(const std::shared_ptr<configuration> &_configuration) {
+    std::scoped_lock its_lock {mutex__};
+    auto its_logger = logger_impl::get();
     its_logger->set_configuration(_configuration);
 
-    const char* its_name = getenv(VSOMEIP_ENV_APPLICATION_NAME);
-    app_name__           = (nullptr != its_name) ? its_name : "";
+    const char *its_name = getenv(VSOMEIP_ENV_APPLICATION_NAME);
+    app_name__ = (nullptr != its_name) ? its_name : "";
 
 #ifdef USE_DLT
-#define VSOMEIP_LOG_DEFAULT_CONTEXT_ID "VSIP"
-#define VSOMEIP_LOG_DEFAULT_CONTEXT_NAME "vSomeIP context"
+#   define VSOMEIP_LOG_DEFAULT_CONTEXT_ID              "VSIP"
+#   define VSOMEIP_LOG_DEFAULT_CONTEXT_NAME            "vSomeIP context"
 
 #ifndef ANDROID
     std::string its_context_id = runtime::get_property("LogContext");
@@ -37,8 +38,7 @@ void logger_impl::init(const std::shared_ptr<configuration>& _configuration)
 #endif
 }
 
-logger_impl::~logger_impl()
-{
+logger_impl::~logger_impl() {
 #ifdef USE_DLT
 #ifndef ANDROID
     DLT_UNREGISTER_CONTEXT(dlt_);
@@ -46,64 +46,56 @@ logger_impl::~logger_impl()
 #endif
 }
 
-level_e logger_impl::get_loglevel() const
-{
+level_e logger_impl::get_loglevel() const {
     return cfg_level;
 }
 
-bool logger_impl::has_console_log() const
-{
+bool logger_impl::has_console_log() const {
     return cfg_console_enabled;
 }
 
-bool logger_impl::has_dlt_log() const
-{
+bool logger_impl::has_dlt_log() const {
     return cfg_dlt_enabled;
 }
 
-bool logger_impl::has_file_log() const
-{
+bool logger_impl::has_file_log() const {
     return cfg_file_enabled;
 }
 
-std::string logger_impl::get_logfile() const
-{
-    std::scoped_lock its_lock{configuration_mutex_};
+std::string logger_impl::get_logfile() const {
+    std::scoped_lock its_lock {configuration_mutex_};
     return cfg_file_name;
 }
 
-const std::string& logger_impl::get_app_name() const
-{
+const std::string& logger_impl::get_app_name() const {
     return app_name__;
 }
 
-std::unique_lock<std::mutex> logger_impl::get_app_name_lock() const
-{
+std::unique_lock<std::mutex> logger_impl::get_app_name_lock() const {
     std::unique_lock its_lock(mutex__);
     return its_lock;
 }
 
-void logger_impl::set_configuration(const std::shared_ptr<configuration>& _configuration)
-{
-    std::scoped_lock its_lock{configuration_mutex_};
-    if (_configuration)
-    {
-        cfg_level           = _configuration->get_loglevel();
+void logger_impl::set_configuration(const std::shared_ptr<configuration>& _configuration) {
+
+    std::scoped_lock its_lock {configuration_mutex_};
+    if (_configuration) {
+        cfg_level = _configuration->get_loglevel();
         cfg_console_enabled = _configuration->has_console_log();
-        cfg_dlt_enabled     = _configuration->has_dlt_log();
-        cfg_file_enabled    = _configuration->has_file_log();
-        cfg_file_name       = _configuration->get_logfile();
+        cfg_dlt_enabled = _configuration->has_dlt_log();
+        cfg_file_enabled = _configuration->has_file_log();
+        cfg_file_name = _configuration->get_logfile();
     }
 }
 
 #ifdef USE_DLT
 #ifndef ANDROID
-void logger_impl::log(level_e _level, const char* _data)
-{
+void
+logger_impl::log(level_e _level, const char *_data) {
+
     // Prepare log level
     DltLogLevelType its_level;
-    switch (_level)
-    {
+    switch (_level) {
     case level_e::LL_FATAL:
         its_level = DLT_LOG_FATAL;
         break;
@@ -126,34 +118,30 @@ void logger_impl::log(level_e _level, const char* _data)
         its_level = DLT_LOG_DEFAULT;
     };
 
-    std::scoped_lock its_lock{dlt_context_mutex_};
+    std::scoped_lock its_lock {dlt_context_mutex_};
     DLT_LOG_STRING(dlt_, its_level, _data);
 }
 
-void logger_impl::register_context(const std::string& _context_id)
-{
-    std::scoped_lock its_lock{dlt_context_mutex_};
+void logger_impl::register_context(const std::string& _context_id) {
+    std::scoped_lock its_lock {dlt_context_mutex_};
     DLT_REGISTER_CONTEXT(dlt_, _context_id.c_str(), VSOMEIP_LOG_DEFAULT_CONTEXT_NAME);
 }
 #endif
 #endif
 
-static std::shared_ptr<logger_impl>* the_logger_ptr__(nullptr);
-static std::mutex                    the_logger_mutex__;
+static std::shared_ptr<logger_impl> *the_logger_ptr__(nullptr);
+static std::mutex the_logger_mutex__;
 
-std::shared_ptr<logger_impl> logger_impl::get()
-{
+std::shared_ptr<logger_impl>
+logger_impl::get() {
 #if defined(__linux__) || defined(ANDROID) || defined(__QNX__)
-    std::scoped_lock its_lock{the_logger_mutex__};
+    std::scoped_lock its_lock {the_logger_mutex__};
 #endif
-    if (the_logger_ptr__ == nullptr)
-    {
+    if (the_logger_ptr__ == nullptr) {
         the_logger_ptr__ = new std::shared_ptr<logger_impl>();
     }
-    if (the_logger_ptr__ != nullptr)
-    {
-        if (!(*the_logger_ptr__))
-        {
+    if (the_logger_ptr__ != nullptr) {
+        if (!(*the_logger_ptr__)) {
             *the_logger_ptr__ = std::make_shared<logger_impl>();
         }
         return *the_logger_ptr__;
@@ -169,8 +157,7 @@ static void logger_impl_teardown(void)
     // Since this function only runs on the main thread, no mutex should be needed. Leaving a
     // comment pending a refactor.
     // std::scoped_lock its_lock(the_logger_mutex__);
-    if (the_logger_ptr__ != nullptr)
-    {
+    if (the_logger_ptr__ != nullptr) {
         the_logger_ptr__->reset();
         delete the_logger_ptr__;
         the_logger_ptr__ = nullptr;
@@ -178,4 +165,5 @@ static void logger_impl_teardown(void)
 }
 #endif
 
-}} // namespace vsomeip_v3::logger
+} // namespace logger
+} // namespace vsomeip_v3

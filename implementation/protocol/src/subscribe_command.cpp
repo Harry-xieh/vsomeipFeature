@@ -3,43 +3,53 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "../include/subscribe_command.hpp"
-
-#include "../../configuration/include/debounce_filter_impl.hpp"
-
 #include <limits>
+
 #include <vsomeip/constants.hpp>
 
-namespace vsomeip_v3 { namespace protocol {
+#include "../include/subscribe_command.hpp"
+#include "../../configuration/include/debounce_filter_impl.hpp"
 
-subscribe_command::subscribe_command() : subscribe_command_base(id_e::SUBSCRIBE_ID) {}
+namespace vsomeip_v3 {
+namespace protocol {
 
-std::shared_ptr<debounce_filter_impl_t> subscribe_command::get_filter() const
-{
+subscribe_command::subscribe_command()
+    : subscribe_command_base(id_e::SUBSCRIBE_ID) {
+}
+
+std::shared_ptr<debounce_filter_impl_t>
+subscribe_command::get_filter() const {
+
     return filter_;
 }
 
-void subscribe_command::set_filter(const std::shared_ptr<debounce_filter_impl_t>& _filter)
-{
+void
+subscribe_command::set_filter(
+        const std::shared_ptr<debounce_filter_impl_t> &_filter) {
+
     filter_ = _filter;
 }
 
-void subscribe_command::serialize(std::vector<byte_t>& _buffer, error_e& _error) const
-{
-    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service_) + sizeof(instance_) + sizeof(eventgroup_)
-                    + sizeof(major_) + sizeof(event_) + sizeof(pending_id_));
+void
+subscribe_command::serialize(std::vector<byte_t> &_buffer,
+        error_e &_error) const {
+
+    size_t its_size(COMMAND_HEADER_SIZE
+            + sizeof(service_) + sizeof(instance_)
+            + sizeof(eventgroup_) + sizeof(major_)
+            + sizeof(event_) + sizeof(pending_id_));
     size_t its_offset(its_size);
 
-    if (filter_)
-    {
-        its_size += sizeof(filter_->on_change_) + sizeof(filter_->on_change_resets_interval_)
-                    + sizeof(filter_->interval_)
-                    + (filter_->ignore_.size() * (sizeof(size_t) + sizeof(byte_t)))
-                    + sizeof(filter_->send_current_value_after_);
+    if (filter_) {
+        its_size += sizeof(filter_->on_change_)
+                + sizeof(filter_->on_change_resets_interval_)
+                + sizeof(filter_->interval_)
+                + (filter_->ignore_.size() * (sizeof(size_t) + sizeof(byte_t)))
+                + sizeof(filter_->send_current_value_after_);
     }
 
-    if (its_size > std::numeric_limits<command_size_t>::max())
-    {
+    if (its_size > std::numeric_limits<command_size_t>::max()) {
+
         _error = error_e::ERROR_MAX_COMMAND_SIZE_EXCEEDED;
         return;
     }
@@ -55,16 +65,15 @@ void subscribe_command::serialize(std::vector<byte_t>& _buffer, error_e& _error)
     if (_error != error_e::ERROR_OK)
         return;
 
-    if (filter_)
-    {
+    if (filter_) {
+
         _buffer[its_offset] = static_cast<byte_t>(filter_->on_change_);
         its_offset += sizeof(filter_->on_change_);
         _buffer[its_offset] = static_cast<byte_t>(filter_->on_change_resets_interval_);
         its_offset += sizeof(filter_->on_change_resets_interval_);
         std::memcpy(&_buffer[its_offset], &filter_->interval_, sizeof(filter_->interval_));
         its_offset += sizeof(filter_->interval_);
-        for (const auto& its_ignore : filter_->ignore_)
-        {
+        for (const auto &its_ignore : filter_->ignore_) {
             std::memcpy(&_buffer[its_offset], &its_ignore.first, sizeof(size_t));
             its_offset += sizeof(size_t);
             _buffer[its_offset] = its_ignore.second;
@@ -75,13 +84,17 @@ void subscribe_command::serialize(std::vector<byte_t>& _buffer, error_e& _error)
     }
 }
 
-void subscribe_command::deserialize(const std::vector<byte_t>& _buffer, error_e& _error)
-{
-    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service_) + sizeof(instance_) + sizeof(eventgroup_)
-                    + sizeof(major_) + sizeof(event_) + sizeof(pending_id_));
+void
+subscribe_command::deserialize(const std::vector<byte_t> &_buffer,
+        error_e &_error) {
 
-    if (its_size > _buffer.size())
-    {
+    size_t its_size(COMMAND_HEADER_SIZE
+            + sizeof(service_) + sizeof(instance_)
+            + sizeof(eventgroup_) + sizeof(major_)
+            + sizeof(event_) + sizeof(pending_id_));
+
+    if (its_size > _buffer.size()) {
+
         _error = error_e::ERROR_NOT_ENOUGH_BYTES;
         return;
     }
@@ -98,25 +111,26 @@ void subscribe_command::deserialize(const std::vector<byte_t>& _buffer, error_e&
 
     // deserialize filter
     size_t its_offset(its_size);
-    if (_buffer.size() - its_offset >= sizeof(bool) + sizeof(bool) + sizeof(int64_t))
-    {
+    if (_buffer.size() - its_offset
+            >= sizeof(bool) + sizeof(bool) + sizeof(int64_t)) {
+
         filter_ = std::make_shared<debounce_filter_impl_t>();
         std::memcpy(&filter_->on_change_, &_buffer[its_offset], sizeof(filter_->on_change_));
         its_offset += sizeof(filter_->on_change_);
-        std::memcpy(&filter_->on_change_resets_interval_, &_buffer[its_offset],
-                    sizeof(filter_->on_change_resets_interval_));
+        std::memcpy(&filter_->on_change_resets_interval_, &_buffer[its_offset], sizeof(filter_->on_change_resets_interval_));
         its_offset += sizeof(filter_->on_change_resets_interval_);
         std::memcpy(&filter_->interval_, &_buffer[its_offset], sizeof(filter_->interval_));
         its_offset += sizeof(filter_->interval_);
 
-        while (_buffer.size() - its_offset >= sizeof(size_t) + sizeof(byte_t))
-        {
+        while (_buffer.size() - its_offset
+                >= sizeof(size_t) + sizeof(byte_t)) {
+
             size_t its_key;
             byte_t its_value;
 
             std::memcpy(&its_key, &_buffer[its_offset], sizeof(its_key));
-            if (filter_->ignore_.find(its_key) != filter_->ignore_.end())
-            {
+            if (filter_->ignore_.find(its_key) != filter_->ignore_.end()) {
+
                 _error = error_e::ERROR_MALFORMED;
                 return;
             }
@@ -128,10 +142,10 @@ void subscribe_command::deserialize(const std::vector<byte_t>& _buffer, error_e&
             filter_->ignore_.emplace(std::make_pair(its_key, its_value));
         }
 
-        std::memcpy(&filter_->send_current_value_after_, &_buffer[its_offset],
-                    sizeof(filter_->send_current_value_after_));
+        std::memcpy(&filter_->send_current_value_after_, &_buffer[its_offset], sizeof(filter_->send_current_value_after_));
         its_offset += sizeof(filter_->send_current_value_after_);
     }
 }
 
-}} // namespace vsomeip_v3::protocol
+} // namespace protocol
+} // namespace vsomeip

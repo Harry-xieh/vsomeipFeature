@@ -3,14 +3,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "../../../e2e_protection/include/e2exf/config.hpp"
-
 #include <ostream>
+#include "../../../e2e_protection/include/e2exf/config.hpp"
 
 namespace vsomeip_v3 {
 
-std::ostream& operator<<(std::ostream& _os, const e2exf::data_identifier_t& _data_identifier)
-{
+std::ostream &operator<<(std::ostream &_os, const e2exf::data_identifier_t &_data_identifier) {
     _os << _data_identifier.first << _data_identifier.second;
     return _os;
 }
