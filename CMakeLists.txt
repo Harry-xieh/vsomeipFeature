@@ -8,6 +8,7 @@ project (vsomeip)
 
 set (VSOMEIP_NAME vsomeip3)
 set (VSOMEIP_COMPAT_NAME vsomeip)
+set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set (VSOMEIP_MAJOR_VERSION 3)
 set (VSOMEIP_MINOR_VERSION 5)

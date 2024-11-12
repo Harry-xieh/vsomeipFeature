@@ -7,32 +7,31 @@
 
 #include "local_routing_test_service.hpp"
 
-local_routing_test_service::local_routing_test_service(bool _use_static_routing) :
-                app_(vsomeip::runtime::get()->create_application()),
-                is_registered_(false),
-                use_static_routing_(_use_static_routing),
-                blocked_(false),
-                number_of_received_messages_(0),
-                offer_thread_(std::bind(&local_routing_test_service::run, this))
-{
-}
+local_routing_test_service::local_routing_test_service(bool _use_static_routing)
+    : app_(vsomeip::runtime::get()->create_application()),
+      is_registered_(false),
+      use_static_routing_(_use_static_routing),
+      blocked_(false),
+      number_of_received_messages_(0),
+      offer_thread_(std::bind(&local_routing_test_service::run, this))
+{}
 
 bool local_routing_test_service::init()
 {
     std::lock_guard<std::mutex> its_lock(mutex_);
 
-    if (!app_->init()) {
+    if (!app_->init())
+    {
         ADD_FAILURE() << "Couldn't initialize application";
         return false;
     }
-    app_->register_message_handler(vsomeip_test::TEST_SERVICE_SERVICE_ID,
-            vsomeip_test::TEST_SERVICE_INSTANCE_ID, vsomeip_test::TEST_SERVICE_METHOD_ID,
-            std::bind(&local_routing_test_service::on_message, this,
-                    std::placeholders::_1));
+    app_->register_message_handler(
+        vsomeip_test::TEST_SERVICE_SERVICE_ID, vsomeip_test::TEST_SERVICE_INSTANCE_ID,
+        vsomeip_test::TEST_SERVICE_METHOD_ID,
+        std::bind(&local_routing_test_service::on_message, this, std::placeholders::_1));
 
     app_->register_state_handler(
-            std::bind(&local_routing_test_service::on_state, this,
-                    std::placeholders::_1));
+        std::bind(&local_routing_test_service::on_state, this, std::placeholders::_1));
 
     VSOMEIP_INFO << "Static routing " << (use_static_routing_ ? "ON" : "OFF");
     return true;
@@ -58,23 +57,25 @@ void local_routing_test_service::join_offer_thread()
 
 void local_routing_test_service::offer()
 {
-    app_->offer_service(vsomeip_test::TEST_SERVICE_SERVICE_ID, vsomeip_test::TEST_SERVICE_INSTANCE_ID);
+    app_->offer_service(vsomeip_test::TEST_SERVICE_SERVICE_ID,
+                        vsomeip_test::TEST_SERVICE_INSTANCE_ID);
 }
 
 void local_routing_test_service::stop_offer()
 {
-    app_->stop_offer_service(vsomeip_test::TEST_SERVICE_SERVICE_ID, vsomeip_test::TEST_SERVICE_INSTANCE_ID);
+    app_->stop_offer_service(vsomeip_test::TEST_SERVICE_SERVICE_ID,
+                             vsomeip_test::TEST_SERVICE_INSTANCE_ID);
 }
 
 void local_routing_test_service::on_state(vsomeip::state_type_e _state)
 {
     VSOMEIP_INFO << "Application " << app_->get_name() << " is "
-            << (_state == vsomeip::state_type_e::ST_REGISTERED ? "registered." :
-                    "deregistered.");
+                 << (_state == vsomeip::state_type_e::ST_REGISTERED ? "registered." :
+                                                                      "deregistered.");
 
-    if(_state == vsomeip::state_type_e::ST_REGISTERED)
+    if (_state == vsomeip::state_type_e::ST_REGISTERED)
     {
-        if(!is_registered_)
+        if (!is_registered_)
         {
             is_registered_ = true;
             std::lock_guard<std::mutex> its_lock(mutex_);
@@ -91,10 +92,9 @@ void local_routing_test_service::on_state(vsomeip::state_type_e _state)
 
 void local_routing_test_service::on_message(const std::shared_ptr<vsomeip::message>& _request)
 {
-    VSOMEIP_INFO << "Received a message with Client/Session [" << std::setw(4)
-            << std::setfill('0') << std::hex << _request->get_client() << "/"
-            << std::setw(4) << std::setfill('0') << std::hex
-            << _request->get_session() << "]";
+    VSOMEIP_INFO << "Received a message with Client/Session [" << std::setw(4) << std::setfill('0')
+                 << std::hex << _request->get_client() << "/" << std::setw(4) << std::setfill('0')
+                 << std::hex << _request->get_session() << "]";
 
     number_of_received_messages_++;
 
@@ -109,23 +109,22 @@ void local_routing_test_service::on_message(const std::shared_ptr<vsomeip::messa
     ASSERT_EQ(_request->get_message_type(), vsomeip::message_type_e::MT_REQUEST);
 
     // check the session id.
-    ASSERT_EQ(_request->get_session(), static_cast<vsomeip::session_t>(number_of_received_messages_));
-
+    ASSERT_EQ(_request->get_session(),
+              static_cast<vsomeip::session_t>(number_of_received_messages_));
 
     // send response
     std::shared_ptr<vsomeip::message> its_response =
-            vsomeip::runtime::get()->create_response(_request);
+        vsomeip::runtime::get()->create_response(_request);
 
     app_->send(its_response);
 
-    if(number_of_received_messages_ >= vsomeip_test::NUMBER_OF_MESSAGES_TO_SEND)
+    if (number_of_received_messages_ >= vsomeip_test::NUMBER_OF_MESSAGES_TO_SEND)
     {
         std::lock_guard<std::mutex> its_lock(mutex_);
-        blocked_ =true;
+        blocked_ = true;
         condition_.notify_one();
     }
-    ASSERT_LT(number_of_received_messages_,
-            vsomeip_test::NUMBER_OF_MESSAGES_TO_SEND + 1);
+    ASSERT_LT(number_of_received_messages_, vsomeip_test::NUMBER_OF_MESSAGES_TO_SEND + 1);
 }
 
 void local_routing_test_service::run()
@@ -135,23 +134,26 @@ void local_routing_test_service::run()
         condition_.wait(its_lock);
 
     blocked_ = false;
-    if(use_static_routing_)
+    if (use_static_routing_)
     {
         offer();
     }
     while (!blocked_)
         condition_.wait(its_lock);
 
-    std::thread t2([](){ std::this_thread::sleep_for(std::chrono::microseconds(1000000 * 5));});
+    std::thread t2([]() {
+        std::this_thread::sleep_for(std::chrono::microseconds(1000000 * 5));
+    });
     t2.join();
     app_->stop();
 }
 
 TEST(someip_local_routing_test, receive_ten_messages_over_local_uds_socket)
 {
-    bool use_static_routing = true;
+    bool                       use_static_routing = true;
     local_routing_test_service test_service(use_static_routing);
-    if (test_service.init()) {
+    if (test_service.init())
+    {
         test_service.start();
         test_service.join_offer_thread();
     }

@@ -9,26 +9,27 @@
 #include "../../../../include/e2e/profile/profile07/protector.hpp"
 #include "../../../../../utility/include/bithelper.hpp"
 
-namespace vsomeip_v3 {
-namespace e2e {
-namespace profile07 {
+namespace vsomeip_v3 { namespace e2e { namespace profile07 {
 
 /** @req [SWS_E2E_00486] */
-void
-protector::protect(e2e_buffer &_buffer, instance_t _instance) {
+void protector::protect(e2e_buffer& _buffer, instance_t _instance)
+{
     std::lock_guard<std::mutex> lock(protect_mutex_);
 
     /** @req: [SWS_E2E_00487] */
-    if (verify_inputs(_buffer)) {
-
+    if (verify_inputs(_buffer))
+    {
         /** @req [SWS_E2E_00489] */
-        bithelper::write_uint32_be(static_cast<uint16_t>(_buffer.size()), &_buffer[config_.offset_ + PROFILE_07_SIZE_OFFSET]);
+        bithelper::write_uint32_be(static_cast<uint16_t>(_buffer.size()),
+                                   &_buffer[config_.offset_ + PROFILE_07_SIZE_OFFSET]);
 
         /** @req [SWS_E2E_00490] */
-        bithelper::write_uint32_be(get_counter(_instance), &_buffer[config_.offset_ + PROFILE_07_COUNTER_OFFSET]);
+        bithelper::write_uint32_be(get_counter(_instance),
+                                   &_buffer[config_.offset_ + PROFILE_07_COUNTER_OFFSET]);
 
         /** @req [SWS_E2E_00491] */
-        bithelper::write_uint32_be(config_.data_id_, &_buffer[config_.offset_ + PROFILE_07_DATAID_OFFSET]);
+        bithelper::write_uint32_be(config_.data_id_,
+                                   &_buffer[config_.offset_ + PROFILE_07_DATAID_OFFSET]);
 
         /** @req [SWS_E2E_00492] */
         uint64_t its_crc = profile_07::compute_crc(config_, _buffer);
@@ -41,16 +42,14 @@ protector::protect(e2e_buffer &_buffer, instance_t _instance) {
     }
 }
 
-bool
-protector::verify_inputs(e2e_buffer &_buffer) {
-
+bool protector::verify_inputs(e2e_buffer& _buffer)
+{
     return (_buffer.size() >= config_.min_data_length_
             && _buffer.size() <= config_.max_data_length_);
 }
 
-uint32_t
-protector::get_counter(instance_t _instance) const {
-
+uint32_t protector::get_counter(instance_t _instance) const
+{
     uint32_t its_counter(0);
 
     auto find_counter = counter_.find(_instance);
@@ -60,9 +59,8 @@ protector::get_counter(instance_t _instance) const {
     return its_counter;
 }
 
-void
-protector::increment_counter(instance_t _instance) {
-
+void protector::increment_counter(instance_t _instance)
+{
     auto find_counter = counter_.find(_instance);
     if (find_counter != counter_.end())
         find_counter->second++;
@@ -70,6 +68,4 @@ protector::increment_counter(instance_t _instance) {
         counter_[_instance] = 1;
 }
 
-} // namespace profile07
-} // namespace e2e
-} // namespace vsomeip_v3
+}}} // namespace vsomeip_v3::e2e::profile07

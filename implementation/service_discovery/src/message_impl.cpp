@@ -32,57 +32,61 @@
 #include "../../message/include/payload_impl.hpp"
 #include "../../message/include/serializer.hpp"
 
-namespace vsomeip_v3 {
-namespace sd {
+namespace vsomeip_v3 { namespace sd {
 
-message_impl::message_impl() :
-    flags_(0x0),
-    options_length_(0x0),
-    current_message_size_(VSOMEIP_SOMEIP_SD_EMPTY_MESSAGE_SIZE) {
-    header_.service_ = VSOMEIP_SD_SERVICE;
+message_impl::message_impl()
+    : flags_(0x0), options_length_(0x0), current_message_size_(VSOMEIP_SOMEIP_SD_EMPTY_MESSAGE_SIZE)
+{
+    header_.service_  = VSOMEIP_SD_SERVICE;
     header_.instance_ = VSOMEIP_SD_INSTANCE;
-    header_.method_ = VSOMEIP_SD_METHOD;
-    header_.client_ = VSOMEIP_SD_CLIENT;
+    header_.method_   = VSOMEIP_SD_METHOD;
+    header_.client_   = VSOMEIP_SD_CLIENT;
     // session must be set dynamically
-    header_.protocol_version_ = protocol_version;
+    header_.protocol_version_  = protocol_version;
     header_.interface_version_ = interface_version;
-    header_.type_ = message_type;
-    header_.code_ = return_code;
+    header_.type_              = message_type;
+    header_.code_              = return_code;
 
     set_unicast_flag(true);
 }
 
-message_impl::~message_impl() {
-}
+message_impl::~message_impl() {}
 
-length_t message_impl::get_length() const {
+length_t message_impl::get_length() const
+{
     length_t current_length = VSOMEIP_SOMEIP_SD_DATA_SIZE;
-    if( entries_.size()) {
+    if (entries_.size())
+    {
         current_length += VSOMEIP_SOMEIP_SD_ENTRY_LENGTH_SIZE;
         current_length += uint32_t(entries_.size() * VSOMEIP_SOMEIP_SD_ENTRY_SIZE);
     }
 
     current_length += VSOMEIP_SOMEIP_SD_OPTION_LENGTH_SIZE;
-    if(options_.size()) {
-        for (size_t i = 0; i < options_.size(); ++i) {
+    if (options_.size())
+    {
+        for (size_t i = 0; i < options_.size(); ++i)
+        {
             current_length += static_cast<length_t>(options_[i]->get_length()
-                    + VSOMEIP_SOMEIP_SD_OPTION_HEADER_SIZE);
+                                                    + VSOMEIP_SOMEIP_SD_OPTION_HEADER_SIZE);
         }
     }
     return current_length;
 }
 
-length_t message_impl::get_size() const {
+length_t message_impl::get_size() const
+{
     return current_message_size_;
 }
 
 #define VSOMEIP_REBOOT_FLAG 0x80
 
-bool message_impl::get_reboot_flag() const {
+bool message_impl::get_reboot_flag() const
+{
     return ((flags_ & VSOMEIP_REBOOT_FLAG) != 0);
 }
 
-void message_impl::set_reboot_flag(bool _is_set) {
+void message_impl::set_reboot_flag(bool _is_set)
+{
     if (_is_set)
         flags_ |= flags_t(VSOMEIP_REBOOT_FLAG);
     else
@@ -91,25 +95,28 @@ void message_impl::set_reboot_flag(bool _is_set) {
 
 #define VSOMEIP_UNICAST_FLAG 0x40
 
-bool message_impl::get_unicast_flag() const {
+bool message_impl::get_unicast_flag() const
+{
     return ((flags_ & VSOMEIP_UNICAST_FLAG) != 0);
 }
 
-void message_impl::set_unicast_flag(bool _is_set) {
+void message_impl::set_unicast_flag(bool _is_set)
+{
     if (_is_set)
         flags_ |= flags_t(VSOMEIP_UNICAST_FLAG);
     else
         flags_ &= flags_t(~VSOMEIP_UNICAST_FLAG);
 }
 
-bool
-message_impl::add_entry_data(const std::shared_ptr<entry_impl> &_entry,
-        const std::vector<std::shared_ptr<option_impl> > &_options,
-        const std::shared_ptr<entry_impl> &_other) {
+bool message_impl::add_entry_data(const std::shared_ptr<entry_impl>&               _entry,
+                                  const std::vector<std::shared_ptr<option_impl>>& _options,
+                                  const std::shared_ptr<entry_impl>&               _other)
+{
     std::uint32_t its_entry_size = VSOMEIP_SOMEIP_SD_ENTRY_SIZE;
     std::map<const std::shared_ptr<option_impl>, bool> its_options;
 
-    if (_other) {
+    if (_other)
+    {
         its_entry_size += VSOMEIP_SOMEIP_SD_ENTRY_SIZE;
     }
 
@@ -118,12 +125,16 @@ message_impl::add_entry_data(const std::shared_ptr<entry_impl> &_entry,
     // might be necessary to copy an option, which then increases
     // the size...
 
-    for (const std::shared_ptr<option_impl> &its_option : _options) {
+    for (const std::shared_ptr<option_impl>& its_option : _options)
+    {
         const auto its_existing_option = find_option(its_option);
-        if (!its_existing_option) {
+        if (!its_existing_option)
+        {
             its_entry_size += its_option->get_size();
             its_options[its_option] = true;
-        } else {
+        }
+        else
+        {
             its_options[its_existing_option] = false;
         }
     }
@@ -133,18 +144,22 @@ message_impl::add_entry_data(const std::shared_ptr<entry_impl> &_entry,
 
     entries_.push_back(_entry);
     _entry->set_owning_message(this);
-    for (const auto &its_option : its_options) {
-        if (its_option.second) {
+    for (const auto& its_option : its_options)
+    {
+        if (its_option.second)
+        {
             options_.push_back(its_option.first);
             its_option.first->set_owning_message(this);
         }
         _entry->assign_option(its_option.first);
     }
 
-    if (_other) {
+    if (_other)
+    {
         entries_.push_back(_other);
         _other->set_owning_message(this);
-        for (const auto &its_option : its_options) {
+        for (const auto& its_option : its_options)
+        {
             _other->assign_option(its_option.first);
         }
     }
@@ -154,42 +169,48 @@ message_impl::add_entry_data(const std::shared_ptr<entry_impl> &_entry,
     return true;
 }
 
-bool
-message_impl::has_entry() const {
+bool message_impl::has_entry() const
+{
     return (0 < entries_.size());
 }
 
-bool
-message_impl::has_option() const {
+bool message_impl::has_option() const
+{
     return (0 < options_.size());
 }
 
-void message_impl::set_length(length_t _length) {
+void message_impl::set_length(length_t _length)
+{
     (void)_length;
 }
 
-const message_impl::entries_t & message_impl::get_entries() const {
+const message_impl::entries_t& message_impl::get_entries() const
+{
     return entries_;
 }
 
-const message_impl::options_t & message_impl::get_options() const {
+const message_impl::options_t& message_impl::get_options() const
+{
     return options_;
 }
 
 std::shared_ptr<option_impl>
-message_impl::find_option(const std::shared_ptr<option_impl> &_option) const {
-    for (auto its_option : options_) {
+message_impl::find_option(const std::shared_ptr<option_impl>& _option) const
+{
+    for (auto its_option : options_)
+    {
         if (its_option->equals(*_option))
             return its_option;
     }
     return nullptr;
 }
 
-int16_t message_impl::get_option_index(
-        const std::shared_ptr<option_impl> &_option) const {
+int16_t message_impl::get_option_index(const std::shared_ptr<option_impl>& _option) const
+{
     int16_t i = 0;
 
-    while (i < int16_t(options_.size())) {
+    while (i < int16_t(options_.size()))
+    {
         if (options_[static_cast<options_t::size_type>(i)] == _option)
             return i;
         i++;
@@ -197,9 +218,10 @@ int16_t message_impl::get_option_index(
     return -1;
 }
 
-std::shared_ptr<option_impl>
-message_impl::get_option(int16_t _index) const {
-    if (_index > -1) {
+std::shared_ptr<option_impl> message_impl::get_option(int16_t _index) const
+{
+    if (_index > -1)
+    {
         size_t its_index = static_cast<size_t>(_index);
         if (its_index < options_.size())
             return options_[its_index];
@@ -207,45 +229,52 @@ message_impl::get_option(int16_t _index) const {
     return nullptr;
 }
 
-uint32_t message_impl::get_options_length() {
+uint32_t message_impl::get_options_length()
+{
     return options_length_;
 }
 
-std::shared_ptr<payload> message_impl::get_payload() const {
+std::shared_ptr<payload> message_impl::get_payload() const
+{
     return std::make_shared<payload_impl>();
 }
 
-void message_impl::set_payload(std::shared_ptr<payload> _payload) {
+void message_impl::set_payload(std::shared_ptr<payload> _payload)
+{
     (void)_payload;
 }
 
-uint8_t message_impl::get_check_result() const {
+uint8_t message_impl::get_check_result() const
+{
     return 1;
 }
-void message_impl::set_check_result(uint8_t _check_result) {
+void message_impl::set_check_result(uint8_t _check_result)
+{
     (void)_check_result;
 }
 
-bool message_impl::is_valid_crc() const {
+bool message_impl::is_valid_crc() const
+{
     return false;
 }
 
-bool message_impl::serialize(vsomeip_v3::serializer *_to) const {
+bool message_impl::serialize(vsomeip_v3::serializer* _to) const
+{
     bool is_successful = header_.serialize(_to);
-    is_successful = is_successful && _to->serialize(flags_);
-    is_successful = is_successful
-            && _to->serialize(protocol::reserved_long, true);
+    is_successful      = is_successful && _to->serialize(flags_);
+    is_successful      = is_successful && _to->serialize(protocol::reserved_long, true);
 
     uint32_t entries_length = uint32_t(entries_.size() * VSOMEIP_SOMEIP_SD_ENTRY_SIZE);
-    is_successful = is_successful && _to->serialize(entries_length);
+    is_successful           = is_successful && _to->serialize(entries_length);
 
     for (const auto& its_entry : entries_)
         is_successful = is_successful && its_entry && its_entry->serialize(_to);
 
     uint32_t options_length = 0;
     for (const auto& its_option : options_)
-        options_length += its_option ? static_cast<uint32_t>(its_option->get_length()
-                + VSOMEIP_SOMEIP_SD_OPTION_HEADER_SIZE) : 0;
+        options_length += its_option ? static_cast<uint32_t>(
+                              its_option->get_length() + VSOMEIP_SOMEIP_SD_OPTION_HEADER_SIZE) :
+                                       0;
     is_successful = is_successful && _to->serialize(options_length);
 
     for (const auto& its_option : options_)
@@ -254,7 +283,8 @@ bool message_impl::serialize(vsomeip_v3::serializer *_to) const {
     return is_successful;
 }
 
-bool message_impl::deserialize(vsomeip_v3::deserializer *_from) {
+bool message_impl::deserialize(vsomeip_v3::deserializer* _from)
+{
     bool is_successful;
     bool option_is_successful(true);
 
@@ -270,14 +300,17 @@ bool message_impl::deserialize(vsomeip_v3::deserializer *_from) {
 
     // entries
     uint32_t entries_length = 0;
-    is_successful = is_successful && _from->deserialize(entries_length);
+    is_successful           = is_successful && _from->deserialize(entries_length);
 
     // backup the current remaining length
     uint32_t save_remaining = uint32_t(_from->get_remaining());
-    if (!is_successful) {
+    if (!is_successful)
+    {
         // couldn't deserialize entries length
         return is_successful;
-    } else if (entries_length > save_remaining) {
+    }
+    else if (entries_length > save_remaining)
+    {
         // not enough data available to deserialize entries array
         is_successful = false;
         return is_successful;
@@ -287,11 +320,15 @@ bool message_impl::deserialize(vsomeip_v3::deserializer *_from) {
     _from->set_remaining(entries_length);
 
     // deserialize the entries
-    while (is_successful && _from->get_remaining()) {
-        std::shared_ptr < entry_impl > its_entry(deserialize_entry(_from));
-        if (its_entry) {
+    while (is_successful && _from->get_remaining())
+    {
+        std::shared_ptr<entry_impl> its_entry(deserialize_entry(_from));
+        if (its_entry)
+        {
             entries_.push_back(its_entry);
-        } else {
+        }
+        else
+        {
             is_successful = false;
         }
     }
@@ -300,7 +337,8 @@ bool message_impl::deserialize(vsomeip_v3::deserializer *_from) {
     _from->set_remaining(save_remaining - entries_length);
 
     // Don't try to deserialize options if there aren't any
-    if(_from->get_remaining() == 0) {
+    if (_from->get_remaining() == 0)
+    {
         return is_successful;
     }
 
@@ -308,15 +346,20 @@ bool message_impl::deserialize(vsomeip_v3::deserializer *_from) {
     is_successful = is_successful && _from->deserialize(options_length_);
 
     // check if there is unreferenced data behind the last option and discard it
-    if(_from->get_remaining() > options_length_) {
+    if (_from->get_remaining() > options_length_)
+    {
         _from->set_remaining(options_length_);
     }
 
-    while (option_is_successful && _from->get_remaining()) {
-        std::shared_ptr < option_impl > its_option(deserialize_option(_from));
-        if (its_option) {
+    while (option_is_successful && _from->get_remaining())
+    {
+        std::shared_ptr<option_impl> its_option(deserialize_option(_from));
+        if (its_option)
+        {
             options_.push_back(its_option);
-        }  else {
+        }
+        else
+        {
             option_is_successful = false;
         }
     }
@@ -324,29 +367,31 @@ bool message_impl::deserialize(vsomeip_v3::deserializer *_from) {
     return is_successful;
 }
 
-entry_impl * message_impl::deserialize_entry(vsomeip_v3::deserializer *_from) {
-    entry_impl *deserialized_entry = 0;
-    uint8_t tmp_entry_type;
+entry_impl* message_impl::deserialize_entry(vsomeip_v3::deserializer* _from)
+{
+    entry_impl* deserialized_entry = 0;
+    uint8_t     tmp_entry_type;
 
-    if (_from->look_ahead(0, tmp_entry_type)) {
-        entry_type_e deserialized_entry_type =
-                static_cast<entry_type_e>(tmp_entry_type);
+    if (_from->look_ahead(0, tmp_entry_type))
+    {
+        entry_type_e deserialized_entry_type = static_cast<entry_type_e>(tmp_entry_type);
 
-        switch (deserialized_entry_type) {
+        switch (deserialized_entry_type)
+        {
         case entry_type_e::FIND_SERVICE:
         case entry_type_e::OFFER_SERVICE:
-            //case entry_type_e::STOP_OFFER_SERVICE:
+            // case entry_type_e::STOP_OFFER_SERVICE:
         case entry_type_e::REQUEST_SERVICE:
             deserialized_entry = new serviceentry_impl;
             break;
 
         case entry_type_e::FIND_EVENT_GROUP:
         case entry_type_e::PUBLISH_EVENTGROUP:
-            //case entry_type_e::STOP_PUBLISH_EVENTGROUP:
+            // case entry_type_e::STOP_PUBLISH_EVENTGROUP:
         case entry_type_e::SUBSCRIBE_EVENTGROUP:
-            //case entry_type_e::STOP_SUBSCRIBE_EVENTGROUP:
+            // case entry_type_e::STOP_SUBSCRIBE_EVENTGROUP:
         case entry_type_e::SUBSCRIBE_EVENTGROUP_ACK:
-            //case entry_type_e::STOP_SUBSCRIBE_EVENTGROUP_ACK:
+            // case entry_type_e::STOP_SUBSCRIBE_EVENTGROUP_ACK:
             deserialized_entry = new eventgroupentry_impl;
             break;
 
@@ -355,9 +400,11 @@ entry_impl * message_impl::deserialize_entry(vsomeip_v3::deserializer *_from) {
         };
 
         // deserialize object
-        if (0 != deserialized_entry) {
+        if (0 != deserialized_entry)
+        {
             deserialized_entry->set_owning_message(this);
-            if (!deserialized_entry->deserialize(_from)) {
+            if (!deserialized_entry->deserialize(_from))
+            {
                 delete deserialized_entry;
                 deserialized_entry = 0;
             };
@@ -367,17 +414,17 @@ entry_impl * message_impl::deserialize_entry(vsomeip_v3::deserializer *_from) {
     return deserialized_entry;
 }
 
-option_impl * message_impl::deserialize_option(vsomeip_v3::deserializer *_from) {
-    option_impl *deserialized_option = 0;
-    uint8_t tmp_option_type;
+option_impl* message_impl::deserialize_option(vsomeip_v3::deserializer* _from)
+{
+    option_impl* deserialized_option = 0;
+    uint8_t      tmp_option_type;
 
-    if (_from->look_ahead(2, tmp_option_type)) {
+    if (_from->look_ahead(2, tmp_option_type))
+    {
+        option_type_e deserialized_option_type = static_cast<option_type_e>(tmp_option_type);
 
-        option_type_e deserialized_option_type =
-                static_cast<option_type_e>(tmp_option_type);
-
-        switch (deserialized_option_type) {
-
+        switch (deserialized_option_type)
+        {
         case option_type_e::CONFIGURATION:
             deserialized_option = new configuration_option_impl;
             break;
@@ -405,8 +452,8 @@ option_impl * message_impl::deserialize_option(vsomeip_v3::deserializer *_from) 
         };
 
         // deserialize object
-        if (0 != deserialized_option
-                && !deserialized_option->deserialize(_from)) {
+        if (0 != deserialized_option && !deserialized_option->deserialize(_from))
+        {
             delete deserialized_option;
             deserialized_option = 0;
         };
@@ -415,29 +462,31 @@ option_impl * message_impl::deserialize_option(vsomeip_v3::deserializer *_from) 
     return deserialized_option;
 }
 
-length_t message_impl::get_someip_length() const {
+length_t message_impl::get_someip_length() const
+{
     return header_.length_;
 }
 
-uid_t message_impl::get_uid() const {
+uid_t message_impl::get_uid() const
+{
     return ANY_UID;
 }
 
-gid_t message_impl::get_gid() const {
+gid_t message_impl::get_gid() const
+{
     return ANY_GID;
 }
 
-vsomeip_sec_client_t message_impl::get_sec_client() const {
-    static vsomeip_sec_client_t its_dummy_sec_client{
-        ANY_UID, ANY_GID, 0, VSOMEIP_SEC_PORT_UNUSED
-    };
+vsomeip_sec_client_t message_impl::get_sec_client() const
+{
+    static vsomeip_sec_client_t its_dummy_sec_client{ANY_UID, ANY_GID, 0, VSOMEIP_SEC_PORT_UNUSED};
 
     return its_dummy_sec_client;
 }
 
-std::string message_impl::get_env() const {
+std::string message_impl::get_env() const
+{
     return ("");
 }
 
-} // namespace sd
-} // namespace vsomeip_v3
+}} // namespace vsomeip_v3::sd

@@ -5,13 +5,10 @@
 
 #include "../include/subscribe_nack_command.hpp"
 
-namespace vsomeip_v3 {
-namespace protocol {
+namespace vsomeip_v3 { namespace protocol {
 
 subscribe_nack_command::subscribe_nack_command()
-    : subscribe_ack_command_base(id_e::SUBSCRIBE_NACK_ID) {
+    : subscribe_ack_command_base(id_e::SUBSCRIBE_NACK_ID)
+{}
 
-}
-
-} // namespace protocol
-} // namespace vsomeip
+}} // namespace vsomeip_v3::protocol

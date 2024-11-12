@@ -6,18 +6,17 @@
 #include "../../../../include/crc/crc.hpp"
 #include "../../../../include/e2e/profile/profile05/profile_05.hpp"
 
-namespace vsomeip_v3 {
-namespace e2e {
-namespace profile05 {
+namespace vsomeip_v3 { namespace e2e { namespace profile05 {
 
-uint16_t profile_05::compute_crc(const profile_config &_config, const e2e_buffer &_buffer) {
-
+uint16_t profile_05::compute_crc(const profile_config& _config, const e2e_buffer& _buffer)
+{
     static const int crcSize = sizeof(uint16_t);
 
     buffer_view its_before(_buffer, _config.offset_);
-    uint16_t computed_crc = e2e_crc::calculate_profile_05(its_before);
+    uint16_t    computed_crc = e2e_crc::calculate_profile_05(its_before);
 
-    if ((_config.offset_ + crcSize) < _buffer.size()) {
+    if ((_config.offset_ + crcSize) < _buffer.size())
+    {
         buffer_view its_after(_buffer, _config.offset_ + crcSize, _buffer.size());
         computed_crc = e2e_crc::calculate_profile_05(its_after, computed_crc);
     }
@@ -32,9 +31,8 @@ uint16_t profile_05::compute_crc(const profile_config &_config, const e2e_buffer
     return computed_crc;
 }
 
-bool profile_05::is_buffer_length_valid(const profile_config &_config, const e2e_buffer &_buffer) {
+bool profile_05::is_buffer_length_valid(const profile_config& _config, const e2e_buffer& _buffer)
+{
     return ((_config.data_length_ / 8) + 1U <= _buffer.size());
 }
-} // namespace profile05
-} // namespace e2e
-} // namespace vsomeip_v3
+}}} // namespace vsomeip_v3::e2e::profile05

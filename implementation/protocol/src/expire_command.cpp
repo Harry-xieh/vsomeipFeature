@@ -9,24 +9,17 @@
 
 #include "../include/expire_command.hpp"
 
-namespace vsomeip_v3 {
-namespace protocol {
+namespace vsomeip_v3 { namespace protocol {
 
-expire_command::expire_command()
-    : subscribe_command_base(id_e::EXPIRE_ID) {
-}
+expire_command::expire_command() : subscribe_command_base(id_e::EXPIRE_ID) {}
 
-void
-expire_command::serialize(std::vector<byte_t> &_buffer,
-        error_e &_error) const {
+void expire_command::serialize(std::vector<byte_t>& _buffer, error_e& _error) const
+{
+    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service_) + sizeof(instance_) + sizeof(eventgroup_)
+                    + sizeof(major_) + sizeof(event_) + sizeof(pending_id_));
 
-    size_t its_size(COMMAND_HEADER_SIZE
-            + sizeof(service_) + sizeof(instance_)
-            + sizeof(eventgroup_) + sizeof(major_)
-            + sizeof(event_) + sizeof(pending_id_));
-
-    if (its_size > std::numeric_limits<command_size_t>::max()) {
-
+    if (its_size > std::numeric_limits<command_size_t>::max())
+    {
         _error = error_e::ERROR_MAX_COMMAND_SIZE_EXCEEDED;
         return;
     }
@@ -41,17 +34,13 @@ expire_command::serialize(std::vector<byte_t> &_buffer,
     subscribe_command_base::serialize(_buffer, _error);
 }
 
-void
-expire_command::deserialize(const std::vector<byte_t> &_buffer,
-        error_e &_error) {
+void expire_command::deserialize(const std::vector<byte_t>& _buffer, error_e& _error)
+{
+    size_t its_size(COMMAND_HEADER_SIZE + sizeof(service_) + sizeof(instance_) + sizeof(eventgroup_)
+                    + sizeof(major_) + sizeof(event_) + sizeof(pending_id_));
 
-    size_t its_size(COMMAND_HEADER_SIZE
-            + sizeof(service_) + sizeof(instance_)
-            + sizeof(eventgroup_) + sizeof(major_)
-            + sizeof(event_) + sizeof(pending_id_));
-
-    if (its_size > _buffer.size()) {
-
+    if (its_size > _buffer.size())
+    {
         _error = error_e::ERROR_NOT_ENOUGH_BYTES;
         return;
     }
@@ -60,5 +49,4 @@ expire_command::deserialize(const std::vector<byte_t> &_buffer,
     subscribe_command_base::deserialize(_buffer, _error);
 }
 
-} // namespace protocol
-} // namespace vsomeip
+}} // namespace vsomeip_v3::protocol

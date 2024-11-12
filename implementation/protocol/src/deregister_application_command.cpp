@@ -7,13 +7,10 @@
 
 #include "../include/deregister_application_command.hpp"
 
-namespace vsomeip_v3 {
-namespace protocol {
+namespace vsomeip_v3 { namespace protocol {
 
 deregister_application_command::deregister_application_command()
-    : simple_command(id_e::DEREGISTER_APPLICATION_ID) {
+    : simple_command(id_e::DEREGISTER_APPLICATION_ID)
+{}
 
-}
-
-} // namespace protocol
-} // namespace vsomeip
+}} // namespace vsomeip_v3::protocol

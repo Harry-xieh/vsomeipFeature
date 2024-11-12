@@ -8,7 +8,8 @@
 using ::testing::ReturnRef;
 using ::testing::Return;
 
-void routing_manager_ut_setup::SetUp() {
+void routing_manager_ut_setup::SetUp()
+{
     configuration_ptr_ =
         std::make_shared<vsomeip_v3::cfg::configuration_impl>("routing_manager_ut_config.json");
 
@@ -22,7 +23,8 @@ void routing_manager_ut_setup::SetUp() {
     its_manager->init();
 }
 
-void routing_manager_ut_setup::TearDown() {
+void routing_manager_ut_setup::TearDown()
+{
     delete its_manager;
     configuration_ptr_.reset();
 }

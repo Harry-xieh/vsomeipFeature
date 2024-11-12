@@ -10,21 +10,21 @@
 #include "../someip_test_globals.hpp"
 #include <common/vsomeip_app_utilities.hpp>
 
-class someip_header_factory_test: public ::testing::Test
+class someip_header_factory_test : public ::testing::Test
 {
 protected:
-    std::shared_ptr<vsomeip::message> request_;
-    std::shared_ptr<vsomeip::message> response_;
-    std::shared_ptr<vsomeip::message> notification_;
+    std::shared_ptr<vsomeip::message>     request_;
+    std::shared_ptr<vsomeip::message>     response_;
+    std::shared_ptr<vsomeip::message>     notification_;
     std::shared_ptr<vsomeip::application> app_;
-    std::shared_ptr<vsomeip::message> message_;
+    std::shared_ptr<vsomeip::message>     message_;
 
-    vsomeip::service_t service_id_ = vsomeip_test::TEST_SERVICE_SERVICE_ID;
-    vsomeip::method_t method_id_ = vsomeip_test::TEST_SERVICE_METHOD_ID;
-    vsomeip::instance_t instance_id_ = vsomeip_test::TEST_SERVICE_INSTANCE_ID;
+    vsomeip::service_t           service_id_        = vsomeip_test::TEST_SERVICE_SERVICE_ID;
+    vsomeip::method_t            method_id_         = vsomeip_test::TEST_SERVICE_METHOD_ID;
+    vsomeip::instance_t          instance_id_       = vsomeip_test::TEST_SERVICE_INSTANCE_ID;
     vsomeip::interface_version_t interface_version_ = 0x01;
-    vsomeip::client_t client_id_ = vsomeip_test::TEST_CLIENT_CLIENT_ID;
-    vsomeip::session_t session_id_ = vsomeip_test::TEST_INITIAL_SESSION_ID;
+    vsomeip::client_t            client_id_         = vsomeip_test::TEST_CLIENT_CLIENT_ID;
+    vsomeip::session_t           session_id_        = vsomeip_test::TEST_INITIAL_SESSION_ID;
 };
 
 TEST_F(someip_header_factory_test, create_request_test)
@@ -44,7 +44,6 @@ TEST_F(someip_header_factory_test, create_request_test)
     // Check the return code
     // this shall be 0x00 (E_OK) according to the spec. TR_SOMEIP_00058
     ASSERT_EQ(request_->get_return_code(), vsomeip::return_code_e::E_OK);
-
 }
 
 TEST_F(someip_header_factory_test, create_request_and_response_test)
@@ -89,7 +88,6 @@ TEST_F(someip_header_factory_test, create_request_and_response_test)
     // this shall be 0x00 (E_OK) according to the spec. TR_SOMEIP_00058
     // and TR_SOMEIP_00191
     ASSERT_EQ(response_->get_return_code(), vsomeip::return_code_e::E_OK);
-
 }
 
 TEST_F(someip_header_factory_test, create_notification_test)

@@ -12,23 +12,27 @@
 
 static std::vector<std::shared_ptr<vsomeip::payload>> payloads__;
 
-debounce_test_client::debounce_test_client(int64_t _interval) :
-    interval(_interval), index_(0), is_available_(false),
-    runner_(std::bind(&debounce_test_client::run, this)),
-    app_(vsomeip::runtime::get()->create_application("debounce_timeout_test_client")) { }
+debounce_test_client::debounce_test_client(int64_t _interval)
+    : interval(_interval),
+      index_(0),
+      is_available_(false),
+      runner_(std::bind(&debounce_test_client::run, this)),
+      app_(vsomeip::runtime::get()->create_application("debounce_timeout_test_client"))
+{}
 
-bool debounce_test_client::init() {
-
+bool debounce_test_client::init()
+{
     bool its_result = app_->init();
-    if (its_result) {
+    if (its_result)
+    {
         app_->register_availability_handler(DEBOUNCE_SERVICE, DEBOUNCE_INSTANCE,
                                             std::bind(&debounce_test_client::on_availability, this,
                                                       std::placeholders::_1, std::placeholders::_2,
                                                       std::placeholders::_3),
                                             DEBOUNCE_MAJOR, DEBOUNCE_MINOR);
         app_->register_message_handler(
-                DEBOUNCE_SERVICE, DEBOUNCE_INSTANCE, vsomeip::ANY_EVENT,
-                std::bind(&debounce_test_client::on_message, this, std::placeholders::_1));
+            DEBOUNCE_SERVICE, DEBOUNCE_INSTANCE, vsomeip::ANY_EVENT,
+            std::bind(&debounce_test_client::on_message, this, std::placeholders::_1));
         app_->request_event(DEBOUNCE_SERVICE, DEBOUNCE_INSTANCE, DEBOUNCE_EVENT,
                             {DEBOUNCE_EVENTGROUP}, vsomeip::event_type_e::ET_FIELD,
                             vsomeip::reliability_type_e::RT_UNRELIABLE);
@@ -44,26 +48,28 @@ bool debounce_test_client::init() {
     return its_result;
 }
 
-void debounce_test_client::start() {
-
+void debounce_test_client::start()
+{
     VSOMEIP_INFO << "Starting Client...";
     app_->start();
 }
 
-void debounce_test_client::stop() {
-
+void debounce_test_client::stop()
+{
     VSOMEIP_INFO << "Stopping Client...";
     app_->stop();
 }
 
-void debounce_test_client::run() {
-
+void debounce_test_client::run()
+{
     {
         std::unique_lock<std::mutex> its_lock(run_mutex_);
-        while (!is_available_) {
+        while (!is_available_)
+        {
             auto its_status = run_condition_.wait_for(its_lock, std::chrono::milliseconds(15000));
             EXPECT_EQ(its_status, std::cv_status::no_timeout);
-            if (its_status == std::cv_status::timeout) {
+            if (its_status == std::cv_status::timeout)
+            {
                 VSOMEIP_ERROR << __func__
                               << ": Debounce service did not become available after 15s.";
                 stop();
@@ -85,25 +91,28 @@ void debounce_test_client::run() {
     stop();
 }
 
-void debounce_test_client::wait() {
-
+void debounce_test_client::wait()
+{
     if (runner_.joinable())
         runner_.join();
 }
 
-void debounce_test_client::on_availability(vsomeip::service_t _service,
-                                           vsomeip::instance_t _instance, bool _is_available) {
-
-    if (_service == DEBOUNCE_SERVICE && _instance == DEBOUNCE_INSTANCE) {
-
-        if (_is_available) {
+void debounce_test_client::on_availability(vsomeip::service_t  _service,
+                                           vsomeip::instance_t _instance, bool _is_available)
+{
+    if (_service == DEBOUNCE_SERVICE && _instance == DEBOUNCE_INSTANCE)
+    {
+        if (_is_available)
+        {
             VSOMEIP_ERROR << __func__ << ": Debounce service becomes available.";
             {
                 std::lock_guard<std::mutex> its_lock(run_mutex_);
                 is_available_ = true;
             }
             run_condition_.notify_one();
-        } else {
+        }
+        else
+        {
             VSOMEIP_ERROR << __func__ << ": Debounce service becomes unavailable.";
 
             std::lock_guard<std::mutex> its_lock(run_mutex_);
@@ -112,11 +121,12 @@ void debounce_test_client::on_availability(vsomeip::service_t _service,
     }
 }
 
-void debounce_test_client::on_message(const std::shared_ptr<vsomeip::message>& _message) {
-
+void debounce_test_client::on_message(const std::shared_ptr<vsomeip::message>& _message)
+{
     std::stringstream s;
     s << "RECV: ";
-    for (uint32_t i = 0; i < _message->get_payload()->get_length(); i++) {
+    for (uint32_t i = 0; i < _message->get_payload()->get_length(); i++)
+    {
         s << std::hex << std::setw(2) << std::setfill('0')
           << static_cast<int>(_message->get_payload()->get_data()[i]) << ' ';
     }
@@ -124,22 +134,22 @@ void debounce_test_client::on_message(const std::shared_ptr<vsomeip::message>& _
 
     // Check if message received is equal to the one it was expecting
     if (DEBOUNCE_SERVICE == _message->get_service()
-        && (DEBOUNCE_EVENT == _message->get_method()
-            || DEBOUNCE_EVENT_2 == _message->get_method())) {
+        && (DEBOUNCE_EVENT == _message->get_method() || DEBOUNCE_EVENT_2 == _message->get_method()))
+    {
         bool is_equal = compare_payload(_message->get_payload(), index_++);
         EXPECT_EQ(is_equal, true);
     }
 }
 
 bool debounce_test_client::compare_payload(const std::shared_ptr<vsomeip::payload>& _payload,
-                                           std::size_t _index) const {
-
+                                           std::size_t                              _index) const
+{
     auto its_expected_payload = payloads__[_index];
     return (*_payload == *its_expected_payload);
 }
 
-void debounce_test_client::run_test() {
-
+void debounce_test_client::run_test()
+{
     // Trigger the test
     auto its_runtime = vsomeip::runtime::get();
     auto its_payload = its_runtime->create_payload();
@@ -155,13 +165,13 @@ void debounce_test_client::run_test() {
     std::this_thread::sleep_for(std::chrono::seconds(23));
 }
 
-void debounce_test_client::unsubscribe_all() {
-
+void debounce_test_client::unsubscribe_all()
+{
     app_->unsubscribe(DEBOUNCE_SERVICE, DEBOUNCE_INSTANCE, DEBOUNCE_EVENTGROUP);
 }
 
-void debounce_test_client::stop_service() {
-
+void debounce_test_client::stop_service()
+{
     auto its_runtime = vsomeip::runtime::get();
     auto its_payload = its_runtime->create_payload();
     auto its_message = its_runtime->create_request(false);
@@ -174,11 +184,13 @@ void debounce_test_client::stop_service() {
     app_->send(its_message);
 }
 
-size_t debounce_test_client::getIndex() {
+size_t debounce_test_client::getIndex()
+{
     return index_;
 }
 
-TEST(debounce_timeout_test, callback) {
+TEST(debounce_timeout_test, callback)
+{
     // Interval time of 2 seconds
     debounce_test_client its_client(2000);
     ASSERT_TRUE(its_client.init());
@@ -189,8 +201,8 @@ TEST(debounce_timeout_test, callback) {
     // Check it got all messages
     EXPECT_EQ(its_client.getIndex(), payloads__.size());
 }
-int main(int argc, char** argv) {
-
+int main(int argc, char** argv)
+{
     std::shared_ptr<vsomeip::payload> its_payload;
 
     its_payload = vsomeip::runtime::get()->create_payload();

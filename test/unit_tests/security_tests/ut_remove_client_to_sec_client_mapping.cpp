@@ -7,13 +7,12 @@
 #include <gtest/gtest.h>
 #include <common/utility.hpp>
 
-namespace
-{
-vsomeip_v3::client_t client = 10;
-vsomeip_v3::uid_t uid = 4003030;
-vsomeip_v3::gid_t gid = 4003032;
+namespace {
+vsomeip_v3::client_t  client       = 10;
+vsomeip_v3::uid_t     uid          = 4003030;
+vsomeip_v3::gid_t     gid          = 4003032;
 vsomeip_sec_ip_addr_t host_address = 0;
-}
+} // namespace
 
 TEST(remove_client_to_sec_client_mapping, check_no_policies_loaded)
 {
@@ -22,7 +21,7 @@ TEST(remove_client_to_sec_client_mapping, check_no_policies_loaded)
     vsomeip_sec_client_t its_sec_client = utility::create_uds_client(uid, gid, host_address);
 
     // client and uid_gid should not be stored yet
-    EXPECT_FALSE(security->get_client_to_sec_client_mapping (client, its_sec_client));
+    EXPECT_FALSE(security->get_client_to_sec_client_mapping(client, its_sec_client));
 
     // client and uid_gid should not be stored yet
     EXPECT_FALSE(security->remove_client_to_sec_client_mapping(client));

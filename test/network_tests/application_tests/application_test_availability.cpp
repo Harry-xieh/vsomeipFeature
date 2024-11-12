@@ -18,13 +18,14 @@ TEST(someip_application_test_availability, register_availability_handlers)
 
     // start client
     application_test_client_availability its_client(application_test::service);
-    int counter(0);
-    while (!its_client.all_availability_handlers_called() && counter < 500) {
+    int                                  counter(0);
+    while (!its_client.all_availability_handlers_called() && counter < 500)
+    {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         counter++;
     }
 
-    //shutdown
+    // shutdown
     its_receiver.stop();
     its_client.stop();
     its_daemon.stop();

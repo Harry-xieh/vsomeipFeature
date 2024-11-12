@@ -8,22 +8,19 @@
 #include "../include/security_policy_response_command_base.hpp"
 #include "../../security/include/policy.hpp"
 
-namespace vsomeip_v3 {
-namespace protocol {
+namespace vsomeip_v3 { namespace protocol {
 
-security_policy_response_command_base::security_policy_response_command_base(
-        id_e _id)
-    : command(_id) {
-}
+security_policy_response_command_base::security_policy_response_command_base(id_e _id)
+    : command(_id)
+{}
 
-void
-security_policy_response_command_base::serialize(std::vector<byte_t> &_buffer,
-        error_e &_error) const {
-
+void security_policy_response_command_base::serialize(std::vector<byte_t>& _buffer,
+                                                      error_e&             _error) const
+{
     size_t its_size(COMMAND_HEADER_SIZE + sizeof(update_id_));
 
-    if (its_size > std::numeric_limits<command_size_t>::max()) {
-
+    if (its_size > std::numeric_limits<command_size_t>::max())
+    {
         _error = error_e::ERROR_MAX_COMMAND_SIZE_EXCEEDED;
         return;
     }
@@ -44,12 +41,11 @@ security_policy_response_command_base::serialize(std::vector<byte_t> &_buffer,
     std::memcpy(&_buffer[its_offset], &update_id_, sizeof(update_id_));
 }
 
-void
-security_policy_response_command_base::deserialize(
-        const std::vector<byte_t> &_buffer, error_e &_error) {
-
-    if (COMMAND_HEADER_SIZE + sizeof(update_id_) > _buffer.size()) {
-
+void security_policy_response_command_base::deserialize(const std::vector<byte_t>& _buffer,
+                                                        error_e&                   _error)
+{
+    if (COMMAND_HEADER_SIZE + sizeof(update_id_) > _buffer.size())
+    {
         _error = error_e::ERROR_NOT_ENOUGH_BYTES;
         return;
     }
@@ -60,21 +56,17 @@ security_policy_response_command_base::deserialize(
         return;
 
     // deserialize payload
-    std::memcpy(&update_id_, &_buffer[COMMAND_POSITION_PAYLOAD],
-            sizeof(update_id_));
+    std::memcpy(&update_id_, &_buffer[COMMAND_POSITION_PAYLOAD], sizeof(update_id_));
 }
 
-uint32_t
-security_policy_response_command_base::get_update_id() const {
-
+uint32_t security_policy_response_command_base::get_update_id() const
+{
     return update_id_;
 }
 
-void
-security_policy_response_command_base::set_update_id(uint32_t _update_id) {
-
+void security_policy_response_command_base::set_update_id(uint32_t _update_id)
+{
     update_id_ = _update_id;
 }
 
-} // namespace protocol
-} // namespace vsomeip
+}} // namespace vsomeip_v3::protocol

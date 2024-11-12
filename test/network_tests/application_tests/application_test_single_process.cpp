@@ -21,20 +21,23 @@ TEST(someip_application_test_single_process, notify_increasing_counter)
     its_daemon.reset();
     // restart client which tries to communicate with service multiple times
     // thus it will always be the new routing manager
-    for (int var = 0; var < 10; ++var) {
+    for (int var = 0; var < 10; ++var)
+    {
         // every time the client is restarted it becomes the rm_stub again
         application_test_client its_client(application_test::service);
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        if(var != 9) {
+        if (var != 9)
+        {
             its_client.stop(false);
-        } else {
+        }
+        else
+        {
             its_client.stop(true);
         }
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     its_receiver.on_shutdown_method_called(vsomeip::runtime::get()->create_message());
 }
-
 
 #if defined(__linux__) || defined(ANDROID) || defined(__QNX__)
 int main(int argc, char** argv)

@@ -7,7 +7,8 @@
 
 namespace vsomeip_v3 {
 
-std::shared_ptr<plugin_manager> plugin_manager::get() {
+std::shared_ptr<plugin_manager> plugin_manager::get()
+{
     return plugin_manager_impl::get();
 }
 

@@ -7,28 +7,20 @@
 
 #include "../include/dummy_command.hpp"
 
-namespace vsomeip_v3 {
-namespace protocol {
+namespace vsomeip_v3 { namespace protocol {
 
-dummy_command::dummy_command()
-        : command(id_e::UNKNOWN_ID) {
+dummy_command::dummy_command() : command(id_e::UNKNOWN_ID) {}
 
-}
-
-void
-dummy_command::serialize(std::vector<byte_t> &_buffer,
-        error_e &_error) const {
-
+void dummy_command::serialize(std::vector<byte_t>& _buffer, error_e& _error) const
+{
     (void)_buffer;
     _error = error_e::ERROR_NOT_ALLOWED;
 }
 
-void
-dummy_command::deserialize(const std::vector<byte_t> &_buffer,
-        error_e &_error) {
-
-    if (_buffer.size() < COMMAND_HEADER_SIZE) {
-
+void dummy_command::deserialize(const std::vector<byte_t>& _buffer, error_e& _error)
+{
+    if (_buffer.size() < COMMAND_HEADER_SIZE)
+    {
         _error = error_e::ERROR_NOT_ENOUGH_BYTES;
         return;
     }
@@ -36,5 +28,4 @@ dummy_command::deserialize(const std::vector<byte_t> &_buffer,
     command::deserialize(_buffer, _error);
 }
 
-} // namespace protocol
-} // namespace vsomeip
+}} // namespace vsomeip_v3::protocol
