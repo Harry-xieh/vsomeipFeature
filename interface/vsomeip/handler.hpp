@@ -6,6 +6,7 @@
 #ifndef VSOMEIP_V3_HANDLER_HPP_
 #define VSOMEIP_V3_HANDLER_HPP_
 
+#include "vsomeip/enumeration_types.hpp"
 #include <functional>
 #include <memory>
 #include <tuple>

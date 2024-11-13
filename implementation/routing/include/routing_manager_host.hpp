@@ -6,6 +6,8 @@
 #ifndef VSOMEIP_V3_ROUTING_MANAGER_HOST_
 #define VSOMEIP_V3_ROUTING_MANAGER_HOST_
 
+#include "vsomeip/constants.hpp"
+#include "vsomeip/enumeration_types.hpp"
 #include <memory>
 
 #include <boost/asio/io_context.hpp>
