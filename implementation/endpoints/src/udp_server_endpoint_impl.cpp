@@ -27,8 +27,8 @@
 
 namespace ip = boost::asio::ip;
 
-namespace vsomeip_v3 {
-
+namespace vsomeip_v3
+{
 udp_server_endpoint_impl::udp_server_endpoint_impl(
     const std::shared_ptr<endpoint_host>& _endpoint_host,
     const std::shared_ptr<routing_host>& _routing_host, boost::asio::io_context& _io,
