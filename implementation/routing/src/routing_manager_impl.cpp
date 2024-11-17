@@ -65,10 +65,11 @@
 #include "../../tracing/include/connector_impl.hpp"
 #endif
 
-namespace vsomeip_v3 {
-
+namespace vsomeip_v3
+{
 #ifdef ANDROID
-namespace sd {
+namespace sd
+{
 runtime::~runtime() {}
 } // namespace sd
 #endif
@@ -4826,8 +4827,9 @@ void routing_manager_impl::clear_targets_and_pending_sub_from_eventgroups(servic
                                 its_event->remove_subscriber(its_eventgroup.first, its_subscriber);
                             }
 
-                            client_t its_client = VSOMEIP_ROUTING_CLIENT; // is_specific_endpoint_client(its_subscriber,
-                                                                          // _service, _instance);
+                            client_t its_client =
+                                VSOMEIP_ROUTING_CLIENT; // is_specific_endpoint_client(its_subscriber,
+                                                        // _service, _instance);
                             {
                                 std::lock_guard<std::mutex> its_lock(
                                     remote_subscription_state_mutex_);

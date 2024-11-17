@@ -39,8 +39,8 @@
 #include "../../tracing/include/connector_impl.hpp"
 #include "../../utility/include/utility.hpp"
 
-namespace vsomeip_v3 {
-
+namespace vsomeip_v3
+{
 #ifdef ANDROID
 configuration::~configuration() {}
 #endif

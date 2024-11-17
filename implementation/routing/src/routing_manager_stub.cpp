@@ -60,8 +60,8 @@
 #include "../../utility/include/bithelper.hpp"
 #include "../../utility/include/utility.hpp"
 
-namespace vsomeip_v3 {
-
+namespace vsomeip_v3
+{
 routing_manager_stub::routing_manager_stub(routing_manager_stub_host*            _host,
                                            const std::shared_ptr<configuration>& _configuration)
     : host_(_host),

@@ -19,8 +19,8 @@
 #include "../../utility/include/bithelper.hpp"
 #include "../../utility/include/utility.hpp"
 
-namespace vsomeip_v3 {
-
+namespace vsomeip_v3
+{
 routing_manager_base::routing_manager_base(routing_manager_host* _host)
     : host_(_host),
       io_(host_->get_io()),
