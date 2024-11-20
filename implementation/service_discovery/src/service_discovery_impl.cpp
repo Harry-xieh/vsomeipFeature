@@ -3149,7 +3149,7 @@ bool service_discovery_impl::check_ipv4_address(const boost::asio::ip::address& 
 void service_discovery_impl::offer_service(const std::shared_ptr<serviceinfo>& _info)
 {
     service_t its_service  = _info->get_service();
-    service_t its_instance = _info->get_instance();
+    instance_t its_instance = _info->get_instance();
 
     std::lock_guard<std::mutex> its_lock(collected_offers_mutex_);
     // check if offer is in map
